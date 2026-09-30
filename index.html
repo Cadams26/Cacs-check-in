@@ -126,6 +126,15 @@
             box-shadow: 0 8px 25px var(--glow-color);
         }
 
+        .zone-pill.warm-kitchen { border-left: 4px solid #F59E0B; }
+        .zone-pill.warm-social { border-left: 4px solid #EC4899; }
+        .zone-pill.warm-gym { border-left: 4px solid #ef4444; }
+        .zone-pill.warm-office { border-left: 4px solid #3B82F6; }
+        .zone-pill.warm-stairway { border-left: 4px solid #8B5CF6; }
+        .zone-pill.warm-hallway { border-left: 4px solid #14B8A6; }
+        .zone-pill.warm-class { border-left: 4px solid #10B981; }
+        .zone-pill.warm-principal { border-left: 4px solid #0F766E; }
+
         .role-btn { border: 2px solid #e5e7eb; transition: all 0.3s ease; }
         
         #key-modal-container { display: none; opacity: 0; transition: opacity 0.3s ease; }
@@ -207,27 +216,54 @@
                 <h2 class="text-2xl font-light tracking-tight">Select Destination</h2>
             </div>
 
-            <div class="space-y-2 overflow-y-auto max-h-[60vh] pb-4 w-full px-1">
-                <div class="zone-pill" onclick="promptKeyCheck('Classrooms')">
+            <div class="space-y-2 overflow-y-auto max-h-[70vh] pb-8 w-full px-1">
+                <div class="zone-pill warm-kitchen bg-gradient-to-r from-orange-50/40 to-transparent" onclick="promptKeyCheck('Kitchen')">
                     <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-medium text-gray-900">Classrooms</h3>
-                        <span class="text-[10px] font-bold px-3 py-1 bg-gray-100 rounded-full uppercase tracking-wider">Quiet</span>
+                        <h3 class="text-xl font-medium text-gray-900 flex items-center">☕ Kitchen</h3>
                     </div>
-                    <p class="text-sm text-gray-400">School in session.</p>
+                    <p class="text-sm text-gray-500">Meal prep and dining area.</p>
                 </div>
-                <div class="zone-pill" onclick="promptKeyCheck('Gymnasium')">
+                <div class="zone-pill warm-social bg-gradient-to-r from-pink-50/40 to-transparent" onclick="promptKeyCheck('Social Room')">
                     <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-medium text-gray-900">Gymnasium</h3>
-                        <span class="text-[10px] font-bold px-3 py-1 bg-gray-100 rounded-full uppercase tracking-wider">Active</span>
+                        <h3 class="text-xl font-medium text-gray-900 flex items-center">🛋️ Social Room</h3>
                     </div>
-                    <p class="text-sm text-gray-400">Open sports and equipment.</p>
+                    <p class="text-sm text-gray-500">Relax, gather, and connect.</p>
                 </div>
-                <div class="zone-pill" onclick="promptKeyCheck('Main Hall & Kitchen')">
+                <div class="zone-pill warm-gym bg-gradient-to-r from-red-50/40 to-transparent" onclick="promptKeyCheck('Main Gymnasium')">
                     <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-medium text-gray-900">Main Hall</h3>
-                        <span class="text-[10px] font-bold px-3 py-1 bg-gray-100 rounded-full uppercase tracking-wider">Moderate</span>
+                        <h3 class="text-xl font-medium text-gray-900 flex items-center">🏀 Main Gymnasium</h3>
                     </div>
-                    <p class="text-sm text-gray-400">Social area and meal prep.</p>
+                    <p class="text-sm text-gray-500">Open sports, athletics, and equipment.</p>
+                </div>
+                <div class="zone-pill warm-office bg-gradient-to-r from-blue-50/40 to-transparent" onclick="promptKeyCheck('Main Office')">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-xl font-medium text-gray-900 flex items-center">📋 Main Office</h3>
+                    </div>
+                    <p class="text-sm text-gray-500">Administration and front desk.</p>
+                </div>
+                <div class="zone-pill warm-stairway bg-gradient-to-r from-purple-50/40 to-transparent" onclick="promptKeyCheck('Stairway Entry')">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-xl font-medium text-gray-900 flex items-center">🪜 Stairway Entry</h3>
+                    </div>
+                    <p class="text-sm text-gray-500">Main thoroughfare and access point.</p>
+                </div>
+                <div class="zone-pill warm-hallway bg-gradient-to-r from-teal-50/40 to-transparent" onclick="promptKeyCheck('Hallways & Washrooms')">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-xl font-medium text-gray-900 flex items-center">💧 Hallways & Washrooms</h3>
+                    </div>
+                    <p class="text-sm text-gray-500">Connecting corridors and facilities.</p>
+                </div>
+                <div class="zone-pill warm-class bg-gradient-to-r from-emerald-50/40 to-transparent" onclick="promptKeyCheck('Main Classroom')">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-xl font-medium text-gray-900 flex items-center">📚 Main Classroom</h3>
+                    </div>
+                    <p class="text-sm text-gray-500">Quiet study and instructional space.</p>
+                </div>
+                <div class="zone-pill warm-principal bg-gradient-to-r from-cyan-50/40 to-transparent" onclick="promptKeyCheck('Principal\'s Office / Classroom')">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-xl font-medium text-gray-900 flex items-center">🎓 Principal's Office</h3>
+                    </div>
+                    <p class="text-sm text-gray-500">Leadership and focused meetings.</p>
                 </div>
             </div>
         </div>
@@ -278,7 +314,7 @@
 
         <!-- VIEW 5: ADMIN DASHBOARD -->
         <div id="view-admin" class="view-state flex-col w-full max-w-md mx-auto">
-            <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center">
                     <button onclick="goToView('view-idle')" class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center mr-3 active:bg-gray-50">&larr;</button>
                     <h2 class="text-2xl font-light tracking-tight">Admin Console</h2>
@@ -286,11 +322,51 @@
                 <button onclick="forceAllOut()" class="text-xs font-bold bg-red-50 text-red-600 px-4 py-2 rounded-full border border-red-200 shadow-sm active:scale-95 transition">Evict All</button>
             </div>
 
-            <div class="glass-panel rounded-[2.5rem] p-6 flex-grow overflow-y-auto max-h-[70vh]">
-                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-5">Session Monitoring</h3>
-                <div id="admin-roster" class="space-y-3">
-                    <p class="text-sm text-gray-400">Loading sessions...</p>
+            <!-- Admin Tabs -->
+            <div class="flex space-x-2 mb-4 overflow-x-auto pb-2 scrollbar-hide text-sm font-medium text-gray-500">
+                <button onclick="switchAdminTab('sessions')" id="tab-btn-sessions" class="admin-tab-btn px-4 py-2 rounded-full bg-black text-white whitespace-nowrap">Sessions</button>
+                <button onclick="switchAdminTab('users')" id="tab-btn-users" class="admin-tab-btn px-4 py-2 rounded-full hover:bg-gray-100 whitespace-nowrap transition">Users</button>
+                <button onclick="switchAdminTab('logs')" id="tab-btn-logs" class="admin-tab-btn px-4 py-2 rounded-full hover:bg-gray-100 whitespace-nowrap transition">Logs</button>
+                <button onclick="switchAdminTab('events')" id="tab-btn-events" class="admin-tab-btn px-4 py-2 rounded-full hover:bg-gray-100 whitespace-nowrap transition">Events</button>
+            </div>
+
+            <div class="glass-panel rounded-[2.5rem] p-6 flex-grow overflow-y-auto max-h-[60vh] relative">
+
+                <!-- SESSIONS TAB -->
+                <div id="admin-tab-sessions" class="admin-tab-content block">
+                    <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-5">Active Monitoring</h3>
+                    <div id="admin-roster" class="space-y-3">
+                        <p class="text-sm text-gray-400">Loading sessions...</p>
+                    </div>
                 </div>
+
+                <!-- USERS TAB -->
+                <div id="admin-tab-users" class="admin-tab-content hidden">
+                    <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-5">User Management</h3>
+                    <div id="admin-users-list" class="space-y-3">
+                        <p class="text-sm text-gray-400">Loading users...</p>
+                    </div>
+                </div>
+
+                <!-- LOGS TAB -->
+                <div id="admin-tab-logs" class="admin-tab-content hidden">
+                    <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-5">Historical Logs</h3>
+                    <div id="admin-logs-list" class="space-y-3">
+                        <p class="text-sm text-gray-400">Loading logs...</p>
+                    </div>
+                </div>
+
+                <!-- EVENTS TAB -->
+                <div id="admin-tab-events" class="admin-tab-content hidden">
+                    <div class="flex justify-between items-center mb-5">
+                        <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Upcoming Events</h3>
+                        <button onclick="promptAddEvent()" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">+ Add</button>
+                    </div>
+                    <div id="admin-events-list" class="space-y-3">
+                        <p class="text-sm text-gray-400">Loading events...</p>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -713,6 +789,138 @@
             }
             element.classList.remove('unread-user');
             element.classList.add('border-transparent');
+        }
+
+        // --- ADMIN TABS & MANAGEMENT ---
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.replace('block', 'hidden'));
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-black', 'text-white');
+                btn.classList.add('hover:bg-gray-100', 'text-gray-500');
+            });
+
+            document.getElementById(`admin-tab-${tabName}`).classList.replace('hidden', 'block');
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            activeBtn.classList.add('bg-black', 'text-white');
+            activeBtn.classList.remove('hover:bg-gray-100', 'text-gray-500');
+
+            if (tabName === 'users') fetchAdminUsers();
+            if (tabName === 'logs') fetchAdminLogs();
+            if (tabName === 'events') fetchAdminEvents();
+            if (tabName === 'sessions') fetchBoard();
+        }
+
+        async function fetchAdminUsers() {
+            try {
+                const records = await pb.collection('users').getList(1, 50, { sort: 'name' });
+                const list = document.getElementById('admin-users-list');
+                if (records.items.length === 0) {
+                    list.innerHTML = '<p class="text-sm text-gray-400">No users found.</p>';
+                    return;
+                }
+                list.innerHTML = records.items.map(user => `
+                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                        <div>
+                            <p class="font-bold text-sm text-gray-900">${user.name}</p>
+                            <p class="text-xs text-gray-500">${user.username} • Role: ${user.role}</p>
+                        </div>
+                        <button onclick="resetUserPassword('${user.id}')" class="text-xs font-bold bg-gray-200 text-gray-700 px-3 py-1.5 rounded-xl hover:bg-gray-300">Reset Pass</button>
+                    </div>
+                `).join('');
+            } catch (err) {
+                document.getElementById('admin-users-list').innerHTML = `<p class="text-xs text-red-500">Failed to load users. Ensure admin permissions.</p>`;
+            }
+        }
+
+        async function resetUserPassword(userId) {
+            const newPass = prompt("Enter a new password for this user (min 8 chars):");
+            if (!newPass || newPass.length < 8) return alert("Password must be at least 8 characters.");
+            try {
+                await pb.collection('users').update(userId, {
+                    password: newPass,
+                    passwordConfirm: newPass
+                });
+                alert("Password updated successfully.");
+            } catch (err) {
+                alert("Failed to update password. API rules might prohibit this without superadmin token.");
+            }
+        }
+
+        async function fetchAdminLogs() {
+            try {
+                const records = await pb.collection('logs').getList(1, 50, { sort: '-created' });
+                const list = document.getElementById('admin-logs-list');
+                if (records.items.length === 0) {
+                    list.innerHTML = '<p class="text-sm text-gray-400">No logs found.</p>';
+                    return;
+                }
+                list.innerHTML = records.items.map(log => {
+                    const date = new Date(log.created).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+                    const statusColor = log.status === 'Checked In' ? 'text-green-600 bg-green-50' : 'text-gray-500 bg-gray-100';
+                    return `
+                    <div class="bg-gray-50 p-3 rounded-2xl border border-gray-100 mb-2">
+                        <div class="flex justify-between items-start mb-1">
+                            <p class="font-bold text-sm text-gray-900">${log.name}</p>
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${statusColor}">${log.status}</span>
+                        </div>
+                        <p class="text-xs text-gray-500">${log.zone} • ${date}</p>
+                    </div>`;
+                }).join('');
+            } catch (err) {
+                document.getElementById('admin-logs-list').innerHTML = '<p class="text-xs text-red-500">Failed to load logs.</p>';
+            }
+        }
+
+        async function fetchAdminEvents() {
+            try {
+                const records = await pb.collection('events').getList(1, 20, { sort: 'date' });
+                const list = document.getElementById('admin-events-list');
+                if (records.items.length === 0) {
+                    list.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">No upcoming events.</p>';
+                    return;
+                }
+                list.innerHTML = records.items.map(ev => {
+                    return `
+                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl border border-gray-100 mb-2">
+                        <div>
+                            <p class="font-bold text-sm text-gray-900">${ev.title}</p>
+                            <p class="text-xs text-gray-500">${ev.date || 'TBD'} • ${ev.location || 'Facility'}</p>
+                        </div>
+                        <button onclick="removeAdminEvent('${ev.id}')" class="text-xs text-red-500 hover:text-red-700 font-bold px-2 py-1">&times;</button>
+                    </div>`;
+                }).join('');
+            } catch (err) {
+                document.getElementById('admin-events-list').innerHTML = '<p class="text-xs text-red-500">Collection "events" not found or access denied.</p>';
+            }
+        }
+
+        async function promptAddEvent() {
+            const title = prompt("Event Title:");
+            if (!title) return;
+            const date = prompt("Event Date/Time (e.g., Oct 14, 6:00 PM):");
+            const location = prompt("Location/Zone:");
+
+            try {
+                await pb.collection('events').create({
+                    title: title,
+                    date: date,
+                    location: location
+                });
+                fetchAdminEvents();
+            } catch (err) {
+                alert("Failed to add event. Make sure an 'events' collection exists in PocketBase.");
+            }
+        }
+
+        async function removeAdminEvent(id) {
+            if (confirm("Delete this event?")) {
+                try {
+                    await pb.collection('events').delete(id);
+                    fetchAdminEvents();
+                } catch (err) {
+                    alert("Failed to delete event.");
+                }
+            }
         }
 
         // --- DATA FETCHING & ADMIN ---
