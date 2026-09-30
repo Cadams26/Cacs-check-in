@@ -65,13 +65,39 @@
             100% { box-shadow: 0 0 20px 0px rgba(26, 26, 46, 0.1); }
         }
         @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.05); }
-            50% { box-shadow: 0 0 25px 8px rgba(0, 0, 0, 0.08); }
+            0% {
+                box-shadow: 0 0 5px 2px rgba(163, 230, 53, 0.2);
+                border-radius: 50%;
+            }
+            33% {
+                border-radius: 53% 47% 55% 45% / 51% 49% 52% 48%;
+                box-shadow: 0 0 35px 12px rgba(163, 230, 53, 0.5);
+            }
+            66% {
+                border-radius: 47% 53% 45% 55% / 49% 51% 48% 52%;
+                box-shadow: 0 0 20px 8px rgba(163, 230, 53, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 5px 2px rgba(163, 230, 53, 0.2);
+                border-radius: 50%;
+            }
         }
 
         .aura-blue { border: 1px solid rgba(0, 122, 255, 0.2); animation: breathe-blue 6s infinite ease-in-out; }
         .aura-black { border: 1px solid rgba(26, 26, 46, 0.2); animation: breathe-black 6s infinite ease-in-out; }
-        .pulse-border-glow { border: 1px solid rgba(0, 0, 0, 0.2); animation: pulse-glow 3s infinite ease-in-out; }
+        .pulse-border-glow { border: 2px solid rgba(163, 230, 53, 0.6); animation: pulse-glow 4s infinite ease-in-out; background: rgba(247, 254, 231, 0.3) !important; }
+
+        .text-3d-pop {
+            text-shadow:
+                0px 1px 0px #e5e7eb,
+                0px 2px 0px #d1d5db,
+                0px 3px 0px #9ca3af,
+                0px 4px 0px #6b7280,
+                0px 8px 10px rgba(0,0,0,0.15),
+                0px 15px 20px rgba(0,0,0,0.1);
+            transform: translateZ(20px);
+        }
+
         .unread-user { border: 1px solid rgba(0, 122, 255, 0.3) !important; animation: breathe-blue 4s infinite ease-in-out; cursor: pointer; transition: all 0.4s ease; }
         .depart-flash-active { animation: depart-pulse 3s cubic-bezier(0.4, 0, 0.2, 1) !important; }
 
@@ -167,9 +193,9 @@
 
         <!-- VIEW 1: Idle -->
         <div id="view-idle" class="view-state flex-col items-center w-full max-w-md">
-            <button onclick="handleEnterTap()" class="circle-btn pulse-border-glow group">
-                <span class="text-4xl font-light tracking-tight transition-transform duration-300 text-gray-900">Enter</span>
-                <span id="idle-welcome-text" class="text-sm font-medium mt-2 text-gray-400">Waiting for input...</span>
+            <button onclick="handleEnterTap()" class="circle-btn pulse-border-glow group relative" style="transform-style: preserve-3d; perspective: 1000px;">
+                <span class="text-5xl font-bold tracking-tight transition-transform duration-300 text-gray-800 text-3d-pop mb-1">Enter</span>
+                <span id="idle-welcome-text" class="text-sm font-medium mt-2 text-gray-400" style="transform: translateZ(5px);">Waiting for input...</span>
             </button>
             <button onclick="logoutProfile()" id="logout-btn" class="hidden mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest">Sign Out</button>
         </div>
@@ -445,10 +471,11 @@
 
         function playCheckInSound() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            playTone(523.25, 'sine', 0.5, 0.1, 0);      // C5
-            playTone(659.25, 'sine', 0.5, 0.1, 0.15);   // E5
-            playTone(783.99, 'sine', 0.8, 0.1, 0.3);    // G5
-            playTone(1046.50, 'sine', 1.2, 0.1, 0.45);  // C6
+            // Lower, softer, longer wind chime effect
+            playTone(261.63, 'sine', 2.0, 0.05, 0);      // C4
+            playTone(329.63, 'sine', 2.0, 0.04, 0.2);    // E4
+            playTone(392.00, 'sine', 2.5, 0.03, 0.4);    // G4
+            playTone(523.25, 'sine', 3.0, 0.02, 0.6);    // C5
         }
 
         function playCheckOutSound() {
