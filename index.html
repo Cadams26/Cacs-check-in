@@ -64,28 +64,18 @@
             30% { box-shadow: 0 0 70px 20px rgba(0, 122, 255, 0.4); border-color: rgba(0, 122, 255, 0.5); }
             100% { box-shadow: 0 0 20px 0px rgba(26, 26, 46, 0.1); }
         }
-        @keyframes pulse-glow {
-            0% {
-                box-shadow: 0 0 5px 2px rgba(163, 230, 53, 0.2);
-                border-radius: 50%;
-            }
-            33% {
-                border-radius: 53% 47% 55% 45% / 51% 49% 52% 48%;
-                box-shadow: 0 0 35px 12px rgba(163, 230, 53, 0.5);
-            }
-            66% {
-                border-radius: 47% 53% 45% 55% / 49% 51% 48% 52%;
-                box-shadow: 0 0 20px 8px rgba(163, 230, 53, 0.4);
-            }
-            100% {
-                box-shadow: 0 0 5px 2px rgba(163, 230, 53, 0.2);
-                border-radius: 50%;
-            }
+        @keyframes bubble-push {
+            0%   { border-radius: 50%; box-shadow: 0 0 5px 0px rgba(163, 230, 53, 0.1); }
+            20%  { border-radius: 55% 45% 50% 50% / 50% 55% 45% 50%; }
+            40%  { border-radius: 45% 55% 50% 50% / 55% 50% 50% 45%; }
+            60%  { border-radius: 50% 50% 55% 45% / 45% 55% 50% 50%; box-shadow: 0 0 25px 5px rgba(163, 230, 53, 0.15); }
+            80%  { border-radius: 50% 50% 45% 55% / 50% 45% 55% 50%; }
+            100% { border-radius: 50%; box-shadow: 0 0 5px 0px rgba(163, 230, 53, 0.1); }
         }
 
         .aura-blue { border: 1px solid rgba(0, 122, 255, 0.2); animation: breathe-blue 6s infinite ease-in-out; }
         .aura-black { border: 1px solid rgba(26, 26, 46, 0.2); animation: breathe-black 6s infinite ease-in-out; }
-        .pulse-border-glow { border: 2px solid rgba(163, 230, 53, 0.6); animation: pulse-glow 4s infinite ease-in-out; background: rgba(247, 254, 231, 0.3) !important; }
+        .bubble-glow { border: 1px solid rgba(163, 230, 53, 0.25); animation: bubble-push 8s infinite ease-in-out; background: rgba(255, 255, 255, 0.6) !important; }
 
         .text-3d-pop {
             text-shadow:
@@ -193,7 +183,7 @@
 
         <!-- VIEW 1: Idle -->
         <div id="view-idle" class="view-state flex-col items-center w-full max-w-md">
-            <button onclick="handleEnterTap()" class="circle-btn pulse-border-glow group relative" style="transform-style: preserve-3d; perspective: 1000px;">
+            <button onclick="handleEnterTap()" class="circle-btn bubble-glow group relative" style="transform-style: preserve-3d; perspective: 1000px;">
                 <span class="text-5xl font-bold tracking-tight transition-transform duration-300 text-gray-800 text-3d-pop mb-1">Enter</span>
                 <span id="idle-welcome-text" class="text-sm font-medium mt-2 text-gray-400" style="transform: translateZ(5px);">Waiting for input...</span>
             </button>
@@ -471,11 +461,9 @@
 
         function playCheckInSound() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            // Lower, softer, longer wind chime effect
-            playTone(261.63, 'sine', 2.0, 0.05, 0);      // C4
-            playTone(329.63, 'sine', 2.0, 0.04, 0.2);    // E4
-            playTone(392.00, 'sine', 2.5, 0.03, 0.4);    // G4
-            playTone(523.25, 'sine', 3.0, 0.02, 0.6);    // C5
+            // Deep, 2-note bass wind chime effect
+            playTone(130.81, 'sine', 2.5, 0.06, 0);      // C3
+            playTone(196.00, 'sine', 3.0, 0.04, 0.3);    // G3
         }
 
         function playCheckOutSound() {
