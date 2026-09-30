@@ -327,7 +327,23 @@
 
         function playClickSound() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            playTone(400, 'sine', 0.1, 0.05);
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.03);
+
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.005);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.03);
         }
 
         function playCheckInSound() {
@@ -358,6 +374,7 @@
         let acknowledgedUsers = JSON.parse(localStorage.getItem('rfe_acked_users') || '[]');
         let doorRecordId = null;
         let currentDoorStatus = 'Locked';
+        let activeOccupantsText = 'Empty';
         let selectedRegRole = 'Guest';
 
         function goToView(viewId) {
@@ -516,30 +533,39 @@
             } catch (err) { console.error("Door error:", err); }
         }
 
-        function updateDoorUI() {
+        function updateHeaderStatus() {
             const indicator = document.getElementById('door-status-indicator');
             const ping = document.getElementById('door-ping');
             const dot = document.getElementById('door-dot');
             const text = document.getElementById('door-text');
-            const toggleBtn = document.getElementById('door-toggle-btn');
             
+            if (!indicator) return;
+
             if (currentDoorStatus === 'Unlocked') {
                 indicator.style.color = '#10B981';
                 ping.style.backgroundColor = '#10B981'; dot.style.backgroundColor = '#10B981';
-                text.innerText = 'DOOR UNLOCKED';
-                if(toggleBtn) {
-                    toggleBtn.innerHTML = '🔒 Lock Facility Door';
-                    toggleBtn.className = 'w-full py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-red-50 text-red-600 border border-red-200 active:scale-95 transition-all shadow-sm';
-                }
             } else {
                 indicator.style.color = '#EF4444';
                 ping.style.backgroundColor = '#EF4444'; dot.style.backgroundColor = '#EF4444';
-                text.innerText = 'DOOR LOCKED';
-                if(toggleBtn) {
-                    toggleBtn.innerHTML = '🔓 Unlock Facility Door';
-                    toggleBtn.className = 'w-full py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-green-50 text-green-600 border border-green-200 active:scale-95 transition-all shadow-sm';
+            }
+
+            text.innerText = `${activeOccupantsText} • ${currentDoorStatus.toUpperCase()}`;
+        }
+
+        function updateDoorUI() {
+            const toggleBtn = document.getElementById('door-toggle-btn');
+
+            if (toggleBtn) {
+                if (currentDoorStatus === 'Unlocked') {
+                    toggleBtn.innerHTML = '🔓 Door Unlocked - Tap to Lock';
+                    toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-green-50 text-green-700 border border-green-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)]';
+                } else {
+                    toggleBtn.innerHTML = '🔒 Door Locked - Tap to Unlock';
+                    toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-red-50 text-red-700 border border-red-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)]';
                 }
             }
+
+            updateHeaderStatus();
         }
 
         async function toggleDoor() {
@@ -643,14 +669,27 @@
                 const activeRecordId = localStorage.getItem('rfe_glass_record_id');
                 
                 if (records.items.length === 0) {
+                    activeOccupantsText = "Empty";
                     roster.innerHTML = '<p class="text-sm text-gray-400 py-2 text-center">Facility is completely empty.</p>';
                     adminRoster.innerHTML = '<p class="text-sm text-gray-400">No active sessions.</p>';
                 } else {
                     const groupedZones = {};
+                    let totalCount = 0;
                     records.items.forEach(log => {
                         if (!groupedZones[log.zone]) groupedZones[log.zone] = [];
                         groupedZones[log.zone].push(log);
+                        totalCount++;
                     });
+
+                    const zoneNames = Object.keys(groupedZones);
+                    if (zoneNames.length === 1) {
+                        activeOccupantsText = `${totalCount} in ${zoneNames[0]}`;
+                    } else if (zoneNames.length <= 2) {
+                        const parts = zoneNames.map(z => `${groupedZones[z].length} in ${z}`);
+                        activeOccupantsText = parts.join(', ');
+                    } else {
+                        activeOccupantsText = `${totalCount} in ${zoneNames.length} Zones`;
+                    }
 
                     let rosterHTML = '';
                     for (const [zoneName, usersInZone] of Object.entries(groupedZones)) {
@@ -701,6 +740,8 @@
                         </div>`;
                     }).join('');
                 }
+
+                updateHeaderStatus();
             } catch (error) { console.error("Board fetch failed", error); }
         }
 
