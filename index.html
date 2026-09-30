@@ -139,7 +139,7 @@
     <header class="p-6 flex justify-between items-center z-10 relative glass-panel rounded-b-3xl">
         <div class="flex items-center space-x-4">
             <div class="w-8 h-8 rounded-full border-2 border-gray-900 flex items-center justify-center font-bold text-xs tracking-tighter">RFE</div>
-            <button id="admin-nav-btn" onclick="goToView('view-admin')" class="hidden text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-black transition">Admin</button>
+            <button id="admin-nav-btn" onclick="promptAdminLogin()" class="hidden text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-black transition">Admin</button>
         </div>
         
         <div id="door-status-indicator" class="hidden items-center space-x-2 text-[11px] font-bold tracking-widest uppercase transition-colors duration-300">
@@ -261,6 +261,21 @@
             <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.01</span>
         </div>
 
+        <!-- ADMIN LOGIN OVERLAY -->
+        <div id="admin-login-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex-col items-center justify-center p-4">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm text-center shadow-2xl scale-95 transition-transform duration-300" id="admin-modal-content">
+                <h3 class="text-xl font-bold mb-2">Admin Access</h3>
+                <p class="text-sm text-gray-500 mb-6">Please enter the admin PIN to continue.</p>
+
+                <input type="password" id="admin-pin-input" class="w-full text-center text-2xl tracking-[0.5em] py-3 rounded-2xl border-2 border-gray-100 bg-gray-50 mb-4 outline-none focus:border-blue-500 focus:bg-white transition-colors" placeholder="****" maxlength="4">
+
+                <div class="flex space-x-3">
+                    <button onclick="closeAdminLogin()" class="flex-1 py-3 rounded-xl font-bold text-gray-600 bg-gray-100 active:bg-gray-200">Cancel</button>
+                    <button onclick="verifyAdminLogin()" class="flex-1 py-3 rounded-xl font-bold text-white bg-black active:scale-95 transition-transform">Unlock</button>
+                </div>
+            </div>
+        </div>
+
         <!-- VIEW 5: ADMIN DASHBOARD -->
         <div id="view-admin" class="view-state flex-col w-full max-w-md mx-auto">
             <div class="flex items-center justify-between mb-8">
@@ -376,6 +391,39 @@
         let currentDoorStatus = 'Locked';
         let activeOccupantsText = 'Empty';
         let selectedRegRole = 'Guest';
+
+        function promptAdminLogin() {
+            document.getElementById('admin-login-modal').classList.replace('hidden', 'flex');
+            setTimeout(() => {
+                document.getElementById('admin-modal-content').classList.replace('scale-95', 'scale-100');
+                document.getElementById('admin-pin-input').value = '';
+                document.getElementById('admin-pin-input').focus();
+            }, 10);
+        }
+
+        function closeAdminLogin() {
+            document.getElementById('admin-modal-content').classList.replace('scale-100', 'scale-95');
+            setTimeout(() => {
+                document.getElementById('admin-login-modal').classList.replace('flex', 'hidden');
+            }, 300);
+        }
+
+        function verifyAdminLogin() {
+            const pin = document.getElementById('admin-pin-input').value;
+            // In a production app, this would be verified server-side.
+            // For this static site, a simple PIN acts as a basic deterrent.
+            if (pin === '2024' || pin === '1234') {
+                closeAdminLogin();
+                goToView('view-admin');
+            } else {
+                const input = document.getElementById('admin-pin-input');
+                input.classList.add('border-red-500', 'text-red-500');
+                setTimeout(() => {
+                    input.classList.remove('border-red-500', 'text-red-500');
+                    input.value = '';
+                }, 500);
+            }
+        }
 
         function goToView(viewId) {
             const targetEl = document.getElementById(viewId);
@@ -613,6 +661,17 @@
             closeKeyModal();
             goToView('view-active');
             document.getElementById('door-status-indicator').classList.replace('hidden', 'flex');
+
+            // If the user physically opened the door with a key, it means the door is now Unlocked.
+            if (usedKey === true && doorRecordId) {
+                try {
+                    currentDoorStatus = 'Unlocked';
+                    updateDoorUI();
+                    await pb.collection('door').update(doorRecordId, { status: 'Unlocked' });
+                } catch (err) {
+                    console.error("Failed to sync door status on key entry", err);
+                }
+            }
 
             try {
                 const record = await pb.collection('logs').create({
