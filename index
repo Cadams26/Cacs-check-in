@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RFE - Check In</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/pocketbase@0.19.0/dist/pocketbase.umd.js"></script>
+    <style>
+        :root {
+            --sharp-blue: #007aff;
+            --sharp-black: #1a1a2e;
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: 0 8px 32px 0 rgba(14, 21, 47, 0.05);
+            --glow-color: rgba(0, 122, 255, 0.15);
+        }
+
+        @keyframes ambient-glow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ffffff, #f4f7fb, #eef2f9, #ffffff);
+            background-size: 400% 400%;
+            animation: ambient-glow 20s ease infinite;
+            color: var(--sharp-black);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+        
+        .view-state {
+            display: none;
+            opacity: 0;
+            transform: scale(0.6); 
+            transition: opacity 0.2s ease-in, transform 0.2s cubic-bezier(0.4, 0, 1, 1); 
+        }
+        .view-state.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1); 
+            transition: opacity 0.3s ease-out, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        @keyframes breathe-blue {
+            0%, 100% { box-shadow: 0 0 20px 0px rgba(0, 122, 255, 0.15); border-color: rgba(0, 122, 255, 0.1); }
+            50% { box-shadow: 0 0 45px 12px rgba(0, 122, 255, 0.25); border-color: rgba(0, 122, 255, 0.3); }
+        }
+        @keyframes breathe-black {
+            0%, 100% { box-shadow: 0 0 20px 0px rgba(26, 26, 46, 0.1); border-color: rgba(26, 26, 46, 0.1); }
+            50% { box-shadow: 0 0 45px 12px rgba(26, 26, 46, 0.2); border-color: rgba(26, 26, 46, 0.2); }
+        }
+        @keyframes depart-pulse {
+            0% { box-shadow: 0 0 20px 0px rgba(26, 26, 46, 0.1); }
+            30% { box-shadow: 0 0 70px 20px rgba(0, 122, 255, 0.4); border-color: rgba(0, 122, 255, 0.5); }
+            100% { box-shadow: 0 0 20px 0px rgba(26, 26, 46, 0.1); }
+        }
+
+        .aura-blue { border: 1px solid rgba(0, 122, 255, 0.2); animation: breathe-blue 6s infinite ease-in-out; }
+        .aura-black { border: 1px solid rgba(26, 26, 46, 0.2); animation: breathe-black 6s infinite ease-in-out; }
+        .unread-user { border: 1px solid rgba(0, 122, 255, 0.3) !important; animation: breathe-blue 4s infinite ease-in-out; cursor: pointer; transition: all 0.4s ease; }
+        .depart-flash-active { animation: depart-pulse 3s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+
+        .circle-btn {
+            width: 16rem;
+            height: 16rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        }
+        .circle-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.7); }
+        .circle-btn span:first-child { font-weight: 200; letter-spacing: 0.05em; }
+
+        .input-clean {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            font-size: 1.25rem;
+            font-weight: 300;
+            background: transparent;
+            outline: none;
+            transition: all 0.4s ease;
+            color: var(--sharp-black);
+            margin-bottom: 1rem;
+        }
+        .input-clean:focus { 
+            border-bottom-color: var(--sharp-blue); 
+            box-shadow: 0 10px 10px -10px var(--glow-color);
+        }
+
+        .zone-pill {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            border-radius: 2rem;
+            padding: 1.5rem 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        .zone-pill:hover, .zone-pill:active {
+            transform: scale(0.98) translateY(-2px);
+            border-color: rgba(0, 122, 255, 0.3);
+            box-shadow: 0 8px 25px var(--glow-color);
+        }
+
+        .role-btn { border: 2px solid #e5e7eb; transition: all 0.3s ease; }
+        
+        #key-modal-container { display: none; opacity: 0; transition: opacity 0.3s ease; }
+        #key-modal-container.active { display: flex; opacity: 1; }
+        #key-modal-content { transform: scale(0.8) translateY(20px); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #key-modal-container.active #key-modal-content { transform: scale(1) translateY(0); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased relative">
+
+    <header class="p-6 flex justify-between items-center z-10 relative glass-panel rounded-b-3xl">
+        <div class="flex items-center space-x-4">
+            <div class="w-8 h-8 rounded-full border-2 border-gray-900 flex items-center justify-center font-bold text-xs tracking-tighter">RFE</div>
+            <button id="admin-nav-btn" onclick="goToView('view-admin')" class="hidden text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-black transition">Admin</button>
+        </div>
+        
+        <div id="door-status-indicator" class="hidden items-center space-x-2 text-[11px] font-bold tracking-widest uppercase transition-colors duration-300">
+            <span class="relative flex h-2 w-2">
+                <span id="door-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                <span id="door-dot" class="relative inline-flex rounded-full h-2 w-2"></span>
+            </span>
+            <span id="door-text">SYNCING...</span>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col justify-center items-center p-6 relative">
+
+        <!-- VIEW 1: Idle -->
+        <div id="view-idle" class="view-state flex-col items-center w-full max-w-md">
+            <button onclick="handleEnterTap()" class="circle-btn aura-blue group">
+                <span class="text-4xl font-light tracking-tight transition-transform duration-300" style="color: var(--sharp-blue);">Enter</span>
+                <span id="idle-welcome-text" class="text-sm font-medium mt-2 text-gray-400">Tap to check in</span>
+            </button>
+            <button onclick="logoutProfile()" id="logout-btn" class="hidden mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest">Sign Out</button>
+        </div>
+
+        <!-- VIEW 2: Identity & Auth -->
+        <div id="view-identity" class="view-state flex-col w-full max-w-sm mx-auto glass-panel p-8 rounded-[2.5rem]">
+            
+            <div class="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
+                <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 text-center font-bold text-lg text-black transition">Login</button>
+                <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 text-center font-bold text-lg text-gray-400 transition">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="form-login" class="flex flex-col">
+                <input type="text" id="login-username" class="input-clean" placeholder="Username" autocapitalize="none">
+                <input type="password" id="login-pass" class="input-clean mb-6" placeholder="Password">
+                <button onclick="executeLogin()" class="w-full py-4 rounded-full font-bold text-lg text-white aura-blue active:scale-95 transition-transform" style="background-color: var(--sharp-blue);">Sign In</button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="form-register" class="hidden flex-col">
+                <input type="text" id="reg-name" class="input-clean" placeholder="First & Last Name">
+                <div class="flex space-x-3">
+                    <input type="text" id="reg-username" class="input-clean w-2/3" placeholder="Username (3+ chars)" autocapitalize="none">
+                    <input type="text" id="reg-key" class="input-clean w-1/3" placeholder="Key #">
+                </div>
+                <input type="password" id="reg-pass" class="input-clean mb-4" placeholder="Password (8+ chars)">
+                
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-2 mt-2">Primary Role</p>
+                <div class="grid grid-cols-2 gap-3 mb-8">
+                    <button onclick="selectRole('Staff', this)" class="role-btn py-3 rounded-full text-xs font-semibold active:scale-95 text-gray-600">Staff</button>
+                    <button onclick="selectRole('Admin', this)" class="role-btn py-3 rounded-full text-xs font-semibold active:scale-95 text-gray-600">Admin</button>
+                    <button onclick="selectRole('Guest', this)" class="role-btn py-3 rounded-full text-xs font-semibold active:scale-95 text-gray-600">Guest</button>
+                    <button onclick="selectRole('Maintenance', this)" class="role-btn py-3 rounded-full text-xs font-semibold active:scale-95 text-gray-600">Maintenance</button>
+                </div>
+
+                <button onclick="executeRegister()" class="w-full py-4 rounded-full font-bold text-lg text-white aura-blue active:scale-95 transition-transform" style="background-color: var(--sharp-blue);">Create Profile</button>
+            </div>
+            
+            <button onclick="goToView('view-idle')" class="mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest text-center w-full">Cancel</button>
+        </div>
+
+        <!-- VIEW 3: Zone -->
+        <div id="view-zone" class="view-state flex-col w-full max-w-md mx-auto">
+            <div class="flex items-center mb-8">
+                <button onclick="goToView('view-idle')" class="w-12 h-12 rounded-full border-2 border-gray-200 flex items-center justify-center mr-4 active:bg-gray-50 text-xl">&larr;</button>
+                <h2 class="text-2xl font-light tracking-tight">Select Destination</h2>
+            </div>
+
+            <div class="space-y-2 overflow-y-auto max-h-[60vh] pb-4 w-full px-1">
+                <div class="zone-pill" onclick="promptKeyCheck('Classrooms')">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-xl font-medium text-gray-900">Classrooms</h3>
+                        <span class="text-[10px] font-bold px-3 py-1 bg-gray-100 rounded-full uppercase tracking-wider">Quiet</span>
+                    </div>
+                    <p class="text-sm text-gray-400">School in session.</p>
+                </div>
+                <div class="zone-pill" onclick="promptKeyCheck('Gymnasium')">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-xl font-medium text-gray-900">Gymnasium</h3>
+                        <span class="text-[10px] font-bold px-3 py-1 bg-gray-100 rounded-full uppercase tracking-wider">Active</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Open sports and equipment.</p>
+                </div>
+                <div class="zone-pill" onclick="promptKeyCheck('Main Hall & Kitchen')">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-xl font-medium text-gray-900">Main Hall</h3>
+                        <span class="text-[10px] font-bold px-3 py-1 bg-gray-100 rounded-full uppercase tracking-wider">Moderate</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Social area and meal prep.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 4: Active -->
+        <div id="view-active" class="view-state flex-col w-full max-w-md mx-auto mt-[-4vh]">
+            <div class="flex justify-center mb-6">
+                <button id="depart-btn" onclick="processCheckOut()" class="circle-btn aura-black" style="width: 14rem; height: 14rem; background: rgba(26, 26, 46, 0.9); color: white;">
+                    <span class="text-3xl font-light tracking-tight">Depart</span>
+                    <span class="text-xs font-medium text-gray-400 mt-2">Tap to check out</span>
+                </button>
+            </div>
+
+            <div class="flex justify-center mb-8 px-4">
+                <button id="door-toggle-btn" onclick="toggleDoor()" class="w-full max-w-[200px] py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-300 border shadow-sm glass-panel">
+                    Connecting to door...
+                </button>
+            </div>
+
+            <div class="glass-panel rounded-[2.5rem] p-6 max-h-[40vh] overflow-y-auto">
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-5 flex items-center">
+                    <span class="w-1.5 h-1.5 rounded-full mr-2" style="background-color: var(--sharp-blue);"></span>
+                    Active Zones & Personnel
+                </h3>
+                <div id="active-roster" class="space-y-6"></div>
+            </div>
+        </div>
+
+        <!-- Version Indicator -->
+        <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">v1.0.0</span>
+        </div>
+
+        <!-- VIEW 5: ADMIN DASHBOARD -->
+        <div id="view-admin" class="view-state flex-col w-full max-w-md mx-auto">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center">
+                    <button onclick="goToView('view-idle')" class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center mr-3 active:bg-gray-50">&larr;</button>
+                    <h2 class="text-2xl font-light tracking-tight">Admin Console</h2>
+                </div>
+                <button onclick="forceAllOut()" class="text-xs font-bold bg-red-50 text-red-600 px-4 py-2 rounded-full border border-red-200 shadow-sm active:scale-95 transition">Evict All</button>
+            </div>
+
+            <div class="glass-panel rounded-[2.5rem] p-6 flex-grow overflow-y-auto max-h-[70vh]">
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-5">Session Monitoring</h3>
+                <div id="admin-roster" class="space-y-3">
+                    <p class="text-sm text-gray-400">Loading sessions...</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- KEY MODAL -->
+    <div id="key-modal-container" class="fixed inset-0 z-50 bg-white/40 backdrop-blur-md items-center justify-center p-4">
+        <div id="key-modal-content" class="glass-panel rounded-[3rem] p-8 w-full max-w-sm shadow-2xl flex flex-col items-center">
+            <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mb-4 border border-gray-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+            </div>
+            <h3 class="text-2xl font-light tracking-tight mb-2 text-center text-gray-900">Facility Access</h3>
+            <p class="text-sm text-gray-400 text-center mb-8">Did you use a physical key to unlock the building today?</p>
+            
+            <div id="responsibility-notice" class="hidden w-full bg-blue-50 border border-blue-100 rounded-3xl p-5 mb-6">
+                <p class="text-xs font-bold uppercase tracking-widest text-blue-600 mb-2">Security Notice</p>
+                <p class="text-sm text-blue-900 font-medium">As a keyholder, you are explicitly responsible for ensuring the facility is locked and secured when you depart.</p>
+            </div>
+
+            <button id="btn-no-key" onclick="executeCheckIn(false)" class="w-full py-4 rounded-full font-bold text-lg bg-gray-100 text-gray-900 active:scale-95 transition-transform mb-3">No, walked in</button>
+            <button id="btn-yes-key" onclick="showResponsibility()" class="w-full py-4 rounded-full font-bold text-lg bg-black text-white active:scale-95 transition-transform">Yes, used a key</button>
+            <button id="btn-accept-key" onclick="executeCheckIn(true)" class="hidden w-full py-4 rounded-full font-bold text-lg text-white active:scale-95 transition-transform aura-blue" style="background-color: var(--sharp-blue);">Accept & Continue</button>
+
+            <button onclick="closeKeyModal()" class="mt-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const pb = new PocketBase('https://api-cacs.justcallcads.com');
+        
+        let pendingZone = '';
+        let acknowledgedUsers = JSON.parse(localStorage.getItem('rfe_acked_users') || '[]');
+        let doorRecordId = null;
+        let currentDoorStatus = 'Locked';
+        let selectedRegRole = 'Guest';
+
+        function goToView(viewId) {
+            const targetEl = document.getElementById(viewId);
+            const activeEls = document.querySelectorAll('.view-state.active');
+
+            if (activeEls.length > 0) {
+                activeEls.forEach(el => {
+                    el.classList.remove('active');
+                    setTimeout(() => {
+                        el.style.display = 'none';
+                        targetEl.style.display = 'flex';
+                        setTimeout(() => targetEl.classList.add('active'), 20);
+                    }, 200); 
+                });
+            } else {
+                targetEl.style.display = 'flex';
+                setTimeout(() => targetEl.classList.add('active'), 20);
+            }
+        }
+
+        // --- AUTH & PROFILE LOGIC ---
+        function switchAuthTab(tab) {
+            if (tab === 'login') {
+                document.getElementById('tab-login').className = 'flex-1 text-center font-bold text-lg text-black transition';
+                document.getElementById('tab-register').className = 'flex-1 text-center font-bold text-lg text-gray-400 transition';
+                document.getElementById('form-login').style.display = 'flex';
+                document.getElementById('form-register').style.display = 'none';
+            } else {
+                document.getElementById('tab-login').className = 'flex-1 text-center font-bold text-lg text-gray-400 transition';
+                document.getElementById('tab-register').className = 'flex-1 text-center font-bold text-lg text-black transition';
+                document.getElementById('form-login').style.display = 'none';
+                document.getElementById('form-register').style.display = 'flex';
+            }
+        }
+
+        function selectRole(role, btnElement) {
+            selectedRegRole = role;
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.remove('aura-blue');
+                btn.style.color = '#4b5563';
+                btn.style.borderColor = '#e5e7eb';
+            });
+            btnElement.classList.add('aura-blue');
+            btnElement.style.color = 'var(--sharp-blue)';
+        }
+
+        async function executeRegister() {
+            const name = document.getElementById('reg-name').value.trim();
+            const rawUsername = document.getElementById('reg-username').value.trim();
+            const keyNumber = document.getElementById('reg-key').value.trim();
+            const password = document.getElementById('reg-pass').value;
+
+            // Enforce lowercase and alphanumeric for PB
+            const safeUsername = rawUsername.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+            if (!name || safeUsername.length < 3 || password.length < 8) {
+                return alert("Please fill your Name. Username must be 3+ characters. Password must be 8+ characters.");
+            }
+
+            // Create a dummy email so PocketBase accepts the creation
+            const dummyEmail = `${safeUsername}@rfe-app.com`;
+
+            try {
+                await pb.collection('users').create({
+                    username: safeUsername,
+                    email: dummyEmail,
+                    password: password,
+                    passwordConfirm: password,
+                    name: name,
+                    role: selectedRegRole,
+                    keyNumber: keyNumber
+                });
+                
+                await pb.collection('users').authWithPassword(safeUsername, password);
+                setupProfileUI();
+                goToView('view-zone');
+            } catch (err) {
+                console.error(err);
+                // Reveal the exact field PocketBase rejected!
+                const errorData = err.data?.data ? JSON.stringify(err.data.data) : err.message;
+                alert("Failed to create profile. Error details: " + errorData);
+            }
+        }
+
+        async function executeLogin() {
+            const rawUsername = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-pass').value;
+            
+            const safeUsername = rawUsername.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+            if (!safeUsername || !password) return;
+
+            try {
+                await pb.collection('users').authWithPassword(safeUsername, password);
+                setupProfileUI();
+                goToView('view-zone');
+            } catch (err) {
+                alert("Invalid username or password.");
+            }
+        }
+
+        function logoutProfile() {
+            pb.authStore.clear();
+            setupProfileUI();
+            alert("Signed out successfully.");
+        }
+
+        function setupProfileUI() {
+            const adminBtn = document.getElementById('admin-nav-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const welcomeText = document.getElementById('idle-welcome-text');
+            
+            if (pb.authStore.isValid && pb.authStore.model) {
+                const firstName = pb.authStore.model.name.split(' ')[0];
+                welcomeText.innerText = `Welcome back, ${firstName}`;
+                logoutBtn.style.display = 'block';
+                
+                if (pb.authStore.model.role === 'Admin') {
+                    adminBtn.style.display = 'block';
+                } else {
+                    adminBtn.style.display = 'none';
+                }
+            } else {
+                welcomeText.innerText = 'Tap to check in';
+                logoutBtn.style.display = 'none';
+                adminBtn.style.display = 'none';
+            }
+        }
+
+        function handleEnterTap() {
+            if (pb.authStore.isValid) {
+                goToView('view-zone');
+            } else {
+                goToView('view-identity');
+            }
+        }
+
+        // --- DOOR LOGIC ---
+        async function initDoorLogic() {
+            try {
+                const records = await pb.collection('door').getList(1, 1);
+                if (records.items.length === 0) {
+                    const newDoor = await pb.collection('door').create({ status: 'Locked' });
+                    doorRecordId = newDoor.id;
+                    currentDoorStatus = 'Locked';
+                } else {
+                    doorRecordId = records.items[0].id;
+                    currentDoorStatus = records.items[0].status;
+                }
+                updateDoorUI();
+                pb.collection('door').subscribe('*', function (e) {
+                    currentDoorStatus = e.record.status;
+                    updateDoorUI();
+                });
+            } catch (err) { console.error("Door error:", err); }
+        }
+
+        function updateDoorUI() {
+            const indicator = document.getElementById('door-status-indicator');
+            const ping = document.getElementById('door-ping');
+            const dot = document.getElementById('door-dot');
+            const text = document.getElementById('door-text');
+            const toggleBtn = document.getElementById('door-toggle-btn');
+            
+            if (currentDoorStatus === 'Unlocked') {
+                indicator.style.color = '#10B981';
+                ping.style.backgroundColor = '#10B981'; dot.style.backgroundColor = '#10B981';
+                text.innerText = 'DOOR UNLOCKED';
+                if(toggleBtn) {
+                    toggleBtn.innerHTML = '🔒 Lock Facility Door';
+                    toggleBtn.className = 'w-full py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-red-50 text-red-600 border border-red-200 active:scale-95 transition-all shadow-sm';
+                }
+            } else {
+                indicator.style.color = '#EF4444';
+                ping.style.backgroundColor = '#EF4444'; dot.style.backgroundColor = '#EF4444';
+                text.innerText = 'DOOR LOCKED';
+                if(toggleBtn) {
+                    toggleBtn.innerHTML = '🔓 Unlock Facility Door';
+                    toggleBtn.className = 'w-full py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-green-50 text-green-600 border border-green-200 active:scale-95 transition-all shadow-sm';
+                }
+            }
+        }
+
+        async function toggleDoor() {
+            if (!doorRecordId) return;
+            const newStatus = currentDoorStatus === 'Locked' ? 'Unlocked' : 'Locked';
+            currentDoorStatus = newStatus;
+            updateDoorUI();
+            try {
+                await pb.collection('door').update(doorRecordId, { status: newStatus });
+            } catch (err) {
+                currentDoorStatus = newStatus === 'Locked' ? 'Unlocked' : 'Locked';
+                updateDoorUI();
+                alert("Failed to communicate with door system.");
+            }
+        }
+
+        // --- CHECK IN / OUT ---
+        function promptKeyCheck(zone) {
+            pendingZone = zone;
+            document.getElementById('responsibility-notice').classList.add('hidden');
+            document.getElementById('btn-no-key').classList.remove('hidden');
+            document.getElementById('btn-yes-key').classList.remove('hidden');
+            document.getElementById('btn-accept-key').classList.add('hidden');
+
+            const modal = document.getElementById('key-modal-container');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeKeyModal() {
+            const modal = document.getElementById('key-modal-container');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        function showResponsibility() {
+            document.getElementById('btn-no-key').classList.add('hidden');
+            document.getElementById('btn-yes-key').classList.add('hidden');
+            document.getElementById('responsibility-notice').classList.remove('hidden');
+            document.getElementById('btn-accept-key').classList.remove('hidden');
+        }
+
+        async function executeCheckIn(usedKey) {
+            closeKeyModal();
+            goToView('view-active');
+            document.getElementById('door-status-indicator').classList.replace('hidden', 'flex');
+
+            try {
+                const record = await pb.collection('logs').create({
+                    name: pb.authStore.model.name,
+                    role: pb.authStore.model.role || 'Guest',
+                    zone: pendingZone,
+                    status: 'Checked In',
+                    usedKey: usedKey
+                });
+
+                localStorage.setItem('rfe_glass_record_id', record.id);
+                fetchBoard();
+            } catch (error) {
+                alert("Network error.");
+                goToView('view-zone');
+            }
+        }
+
+        async function processCheckOut() {
+            const activeRecordId = localStorage.getItem('rfe_glass_record_id');
+            if (!activeRecordId) return goToView('view-idle');
+
+            try {
+                await pb.collection('logs').update(activeRecordId, { status: 'Checked Out' });
+                localStorage.removeItem('rfe_glass_record_id');
+                document.getElementById('door-status-indicator').classList.replace('flex', 'hidden');
+                goToView('view-idle');
+                fetchBoard();
+            } catch (error) {
+                alert("Failed to check out.");
+            }
+        }
+
+        function acknowledgeUser(recordId, element) {
+            if (!acknowledgedUsers.includes(recordId)) {
+                acknowledgedUsers.push(recordId);
+                localStorage.setItem('rfe_acked_users', JSON.stringify(acknowledgedUsers));
+            }
+            element.classList.remove('unread-user');
+            element.classList.add('border-transparent');
+        }
+
+        // --- DATA FETCHING & ADMIN ---
+        async function fetchBoard() {
+            try {
+                const records = await pb.collection('logs').getList(1, 100, {
+                    filter: 'status = "Checked In"',
+                    sort: '-created'
+                });
+                
+                const roster = document.getElementById('active-roster');
+                const adminRoster = document.getElementById('admin-roster');
+                const activeRecordId = localStorage.getItem('rfe_glass_record_id');
+                
+                if (records.items.length === 0) {
+                    roster.innerHTML = '<p class="text-sm text-gray-400 py-2 text-center">Facility is completely empty.</p>';
+                    adminRoster.innerHTML = '<p class="text-sm text-gray-400">No active sessions.</p>';
+                } else {
+                    const groupedZones = {};
+                    records.items.forEach(log => {
+                        if (!groupedZones[log.zone]) groupedZones[log.zone] = [];
+                        groupedZones[log.zone].push(log);
+                    });
+
+                    let rosterHTML = '';
+                    for (const [zoneName, usersInZone] of Object.entries(groupedZones)) {
+                        rosterHTML += `
+                            <div>
+                                <div class="flex items-center mb-3">
+                                    <h4 class="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1">${zoneName}</h4>
+                                </div>
+                                <div class="space-y-3">
+                                    ${usersInZone.map(log => {
+                                        const isMe = log.id === activeRecordId;
+                                        const isAcked = acknowledgedUsers.includes(log.id) || isMe;
+                                        const auraClass = isAcked ? 'border-transparent' : 'unread-user';
+                                        const hasKey = log.usedKey || log.used_key || log.usedkey;
+                                        const keySvg = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>';
+                                        const keyBadge = hasKey ? `<div class="flex flex-col items-center justify-center px-3 py-2 ml-3 border-l border-gray-100">${keySvg}<span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-1">Key</span></div>` : '';
+
+                                        return `
+                                        <div class="flex justify-between items-center p-4 bg-white rounded-3xl border-2 ${auraClass} shadow-sm transition-all" onclick="acknowledgeUser('${log.id}', this)">
+                                            <div class="flex-grow">
+                                                <p class="font-bold text-gray-900 text-lg flex items-center">
+                                                    ${log.name}${isMe ? '<span class="text-[10px] font-bold text-gray-400 ml-2 border border-gray-200 px-2 rounded-full">(You)</span>' : ''}
+                                                </p>
+                                                <div class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">${log.role}</div>
+                                            </div>
+                                            ${keyBadge}
+                                        </div>`;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    roster.innerHTML = rosterHTML;
+
+                    adminRoster.innerHTML = records.items.map(log => {
+                        const checkInTime = new Date(log.created);
+                        const diffHours = Math.floor((new Date() - checkInTime) / (1000 * 60 * 60));
+                        let durationText = diffHours > 0 ? `${diffHours} hour(s) ago` : 'Recently';
+                        let warningClass = diffHours > 8 ? 'text-red-500 font-bold' : 'text-gray-400';
+
+                        return `
+                        <div class="flex justify-between items-center p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                            <div>
+                                <p class="font-bold text-gray-900">${log.name} <span class="text-[10px] bg-gray-100 px-2 py-0.5 rounded-full ml-1">${log.zone}</span></p>
+                                <p class="text-[10px] ${warningClass} uppercase tracking-widest mt-1">Checked in: ${durationText}</p>
+                            </div>
+                            <button onclick="forceCheckoutUser('${log.id}')" class="bg-gray-100 text-gray-600 p-2 rounded-xl text-xs font-bold hover:bg-red-50 hover:text-red-600 transition">Evict</button>
+                        </div>`;
+                    }).join('');
+                }
+            } catch (error) { console.error("Board fetch failed", error); }
+        }
+
+        async function forceCheckoutUser(id) {
+            if(confirm("Log this user out?")) {
+                await pb.collection('logs').update(id, { status: 'Checked Out' });
+                fetchBoard();
+            }
+        }
+
+        async function forceAllOut() {
+            if(confirm("DANGER: This will evict everyone currently in the building. Continue?")) {
+                const records = await pb.collection('logs').getFullList({ filter: 'status = "Checked In"' });
+                for (let record of records) {
+                    await pb.collection('logs').update(record.id, { status: 'Checked Out' });
+                }
+                fetchBoard();
+            }
+        }
+
+        function triggerDepartGlow() {
+            const departBtn = document.getElementById('depart-btn');
+            if (departBtn) {
+                departBtn.classList.remove('depart-flash-active');
+                void departBtn.offsetWidth;
+                departBtn.classList.add('depart-flash-active');
+            }
+        }
+
+        function initApp() {
+            setupProfileUI();
+
+            const activeRecordId = localStorage.getItem('rfe_glass_record_id');
+            if (activeRecordId && pb.authStore.isValid) {
+                goToView('view-active');
+                document.getElementById('door-status-indicator').classList.replace('hidden', 'flex');
+            } else {
+                goToView('view-idle');
+            }
+            
+            initDoorLogic();
+            fetchBoard();
+
+            pb.collection('logs').subscribe('*', function (e) {
+                fetchBoard();
+                if (document.getElementById('view-active').classList.contains('active')) {
+                    triggerDepartGlow();
+                }
+            });
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
+Click the green Commit changes button.
+Step 3: Enable the automatic OTA updating (GitHub Pages)
+Once you have the index.html file in there, we can add the 60-second deploy script.
+
+Click Add file -> Create new file again.
+For the name, type: .github/workflows/deploy-pages.yml
+Paste this exact code:
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
