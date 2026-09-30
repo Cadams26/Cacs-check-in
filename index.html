@@ -258,7 +258,7 @@
 
         <!-- Version Indicator -->
         <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
-            <span class="text-[10px] font-medium tracking-widest text-gray-500">v1.0.0</span>
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.01</span>
         </div>
 
         <!-- VIEW 5: ADMIN DASHBOARD -->
@@ -306,6 +306,52 @@
     </div>
 
     <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(freq, type, duration, vol, delay=0) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+
+            gain.gain.setValueAtTime(0, audioCtx.currentTime + delay);
+            gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + delay + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(audioCtx.currentTime + delay);
+            osc.stop(audioCtx.currentTime + delay + duration);
+        }
+
+        function playClickSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            playTone(400, 'sine', 0.1, 0.05);
+        }
+
+        function playCheckInSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            playTone(523.25, 'sine', 0.5, 0.1, 0);      // C5
+            playTone(659.25, 'sine', 0.5, 0.1, 0.15);   // E5
+            playTone(783.99, 'sine', 0.8, 0.1, 0.3);    // G5
+            playTone(1046.50, 'sine', 1.2, 0.1, 0.45);  // C6
+        }
+
+        function playCheckOutSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            playTone(659.25, 'sine', 0.3, 0.1, 0);      // E5
+            playTone(523.25, 'sine', 0.8, 0.1, 0.2);    // C5
+        }
+
+        document.addEventListener('click', (e) => {
+            const isButton = e.target.tagName === 'BUTTON' || e.target.closest('button');
+            const isZone = e.target.classList && e.target.classList.contains('zone-pill') || e.target.closest('.zone-pill');
+            if (isButton || isZone) {
+                playClickSound();
+            }
+        });
+
         const pb = new PocketBase('https://api-cacs.justcallcads.com');
         
         let pendingZone = '';
@@ -537,6 +583,7 @@
         }
 
         async function executeCheckIn(usedKey) {
+            playCheckInSound();
             closeKeyModal();
             goToView('view-active');
             document.getElementById('door-status-indicator').classList.replace('hidden', 'flex');
@@ -559,6 +606,7 @@
         }
 
         async function processCheckOut() {
+            playCheckOutSound();
             const activeRecordId = localStorage.getItem('rfe_glass_record_id');
             if (!activeRecordId) return goToView('view-idle');
 
