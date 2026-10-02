@@ -29,20 +29,20 @@
             -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
         }
-        
+
         .view-state {
             display: none;
             opacity: 0;
-            transform: scale(0.6); 
-            transition: opacity 0.2s ease-in, transform 0.2s cubic-bezier(0.4, 0, 1, 1); 
+            transform: scale(0.6);
+            transition: opacity 0.2s ease-in, transform 0.2s cubic-bezier(0.4, 0, 1, 1);
         }
         .view-state.active {
             display: flex;
             opacity: 1;
-            transform: scale(1); 
-            transition: opacity 0.3s ease-out, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            transform: scale(1);
+            transition: opacity 0.3s ease-out, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        
+
         .glass-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
@@ -122,8 +122,8 @@
             color: var(--sharp-black);
             margin-bottom: 1rem;
         }
-        .input-clean:focus { 
-            border-bottom-color: var(--sharp-blue); 
+        .input-clean:focus {
+            border-bottom-color: var(--sharp-blue);
             box-shadow: 0 10px 10px -10px var(--glow-color);
         }
 
@@ -154,11 +154,16 @@
         .zone-icon-btn.warm-class { border-bottom: 3px solid #10B981; }
 
         .role-btn { border: 2px solid #e5e7eb; transition: all 0.3s ease; }
-        
+
         #key-modal-container { display: none; opacity: 0; transition: opacity 0.3s ease; }
         #key-modal-container.active { display: flex; opacity: 1; }
         #key-modal-content { transform: scale(0.8) translateY(20px); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
         #key-modal-container.active #key-modal-content { transform: scale(1) translateY(0); }
+
+        #tos-modal-container { display: none; opacity: 0; transition: opacity 0.3s ease; }
+        #tos-modal-container.active { display: flex; opacity: 1; }
+        #tos-modal-content { transform: scale(0.8) translateY(20px); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #tos-modal-container.active #tos-modal-content { transform: scale(1) translateY(0); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased relative">
@@ -168,7 +173,7 @@
             <div class="w-8 h-8 rounded-full border-2 border-gray-900 flex items-center justify-center font-bold text-xs tracking-tighter">RFE</div>
             <button id="admin-nav-btn" onclick="promptAdminLogin()" class="hidden text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-black transition">Admin</button>
         </div>
-        
+
         <div id="door-status-indicator" class="hidden items-center space-x-2 text-[11px] font-bold tracking-widest uppercase transition-colors duration-300">
             <span class="relative flex h-2 w-2">
                 <span id="door-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
@@ -210,7 +215,7 @@
 
         <!-- VIEW 2: Identity & Auth -->
         <div id="view-identity" class="view-state flex-col w-full max-w-sm mx-auto glass-panel p-8 rounded-[2.5rem]">
-            
+
             <div class="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
                 <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 text-center font-bold text-lg text-black transition">Login</button>
                 <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 text-center font-bold text-lg text-gray-400 transition">Register</button>
@@ -231,18 +236,25 @@
                     <input type="text" id="reg-key" class="input-clean w-1/3" placeholder="Key #">
                 </div>
                 <input type="password" id="reg-pass" class="input-clean mb-4" placeholder="Password (8+ chars)">
-                
+
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-2 mt-2">Primary Role</p>
-                <div class="grid grid-cols-2 gap-3 mb-8">
+                <div class="grid grid-cols-2 gap-3 mb-6">
                     <button onclick="selectRole('Staff', this)" class="role-btn py-3 rounded-full text-xs font-semibold active:scale-95 text-gray-600">Staff</button>
                     <button onclick="selectRole('Admin', this)" class="role-btn py-3 rounded-full text-xs font-semibold active:scale-95 text-gray-600">Admin</button>
                     <button onclick="selectRole('Guest', this)" class="role-btn py-3 rounded-full text-xs font-semibold active:scale-95 text-gray-600">Guest</button>
                     <button onclick="selectRole('Maintenance', this)" class="role-btn py-3 rounded-full text-xs font-semibold active:scale-95 text-gray-600">Maintenance</button>
                 </div>
 
+                <div class="flex items-center mb-6 pl-2">
+                    <input type="checkbox" id="reg-tos" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                    <label id="reg-tos-label" for="reg-tos" class="ml-3 text-sm text-gray-500 select-none cursor-pointer">
+                        I agree to the Facility Access <span class="font-bold text-blue-600 hover:underline" onclick="event.preventDefault(); openTosModal();">terms</span>
+                    </label>
+                </div>
+
                 <button onclick="executeRegister()" class="w-full py-4 rounded-full font-bold text-lg text-white aura-blue active:scale-95 transition-transform" style="background-color: var(--sharp-blue);">Create Profile</button>
             </div>
-            
+
             <button onclick="goToView('view-idle')" class="mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest text-center w-full">Cancel</button>
         </div>
 
@@ -426,6 +438,34 @@
         </div>
     </div>
 
+    <!-- TOS MODAL -->
+    <div id="tos-modal-container" class="fixed inset-0 z-50 bg-white/40 backdrop-blur-md items-center justify-center p-4">
+        <div id="tos-modal-content" class="glass-panel rounded-[3rem] p-8 w-full max-w-md shadow-2xl flex flex-col" style="max-height: 90vh; overflow-y: auto;">
+            <h3 class="text-2xl font-light tracking-tight mb-6 text-center text-gray-900">Facility Access Agreement</h3>
+
+            <div class="space-y-4 text-sm text-gray-600 mb-8 bg-gray-50/50 p-6 rounded-3xl border border-gray-100">
+                <p>By registering for access to the CACS / Riverside Forest Explorers facility, you agree to the following Standard Operating Procedures:</p>
+
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-1">Mandatory Logging:</h4>
+                    <p>Check-in is strictly required upon arrival for all personnel and guests to maintain site security and comply with provincial safety standards.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-1">Zone Boundaries:</h4>
+                    <p>You are authorized to access only your selected destination. You must not enter unapproved zones or disrupt active school operations.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-1">Keyholder Accountability:</h4>
+                    <p>If you access the building using a physical key, you assume total responsibility for ensuring the facility is locked and fully secured when you leave.</p>
+                </div>
+            </div>
+
+            <button onclick="closeTosModal()" class="w-full py-4 rounded-full font-bold text-lg text-white bg-blue-600 active:scale-95 transition-transform shadow-lg shadow-blue-600/30">Close</button>
+        </div>
+    </div>
+
     <!-- KEY MODAL -->
     <div id="key-modal-container" class="fixed inset-0 z-50 bg-white/40 backdrop-blur-md items-center justify-center p-4">
         <div id="key-modal-content" class="glass-panel rounded-[3rem] p-8 w-full max-w-sm shadow-2xl flex flex-col items-center">
@@ -436,7 +476,7 @@
             </div>
             <h3 class="text-2xl font-light tracking-tight mb-2 text-center text-gray-900">Facility Access</h3>
             <p class="text-sm text-gray-400 text-center mb-8">Did you use a physical key to unlock the building today?</p>
-            
+
             <div id="responsibility-notice" class="hidden w-full bg-blue-50 border border-blue-100 rounded-3xl p-5 mb-6">
                 <p class="text-xs font-bold uppercase tracking-widest text-blue-600 mb-2">Security Notice</p>
                 <p class="text-sm text-blue-900 font-medium">As a keyholder, you are explicitly responsible for ensuring the facility is locked and secured when you depart.</p>
@@ -513,7 +553,7 @@
         });
 
         const pb = new PocketBase('https://api-cacs.justcallcads.com');
-        
+
         let pendingZone = '';
         let acknowledgedUsers = JSON.parse(localStorage.getItem('rfe_acked_users') || '[]');
         let doorRecordId = null;
@@ -565,7 +605,7 @@
                         el.style.display = 'none';
                         targetEl.style.display = 'flex';
                         setTimeout(() => targetEl.classList.add('active'), 20);
-                    }, 200); 
+                    }, 200);
                 });
             } else {
                 targetEl.style.display = 'flex';
@@ -599,11 +639,31 @@
             btnElement.style.color = 'var(--sharp-blue)';
         }
 
+        function openTosModal() {
+            const modal = document.getElementById('tos-modal-container');
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.classList.add('active'); }, 10);
+        }
+
+        function closeTosModal() {
+            const modal = document.getElementById('tos-modal-container');
+            modal.classList.remove('active');
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+        }
+
         async function executeRegister() {
             const name = document.getElementById('reg-name').value.trim();
             const rawUsername = document.getElementById('reg-username').value.trim();
             const keyNumber = document.getElementById('reg-key').value.trim();
             const password = document.getElementById('reg-pass').value;
+            const tosAccepted = document.getElementById('reg-tos').checked;
+
+            if (!tosAccepted) {
+                const label = document.getElementById('reg-tos-label');
+                label.classList.add('text-red-500');
+                setTimeout(() => label.classList.remove('text-red-500'), 1500);
+                return;
+            }
 
             // Enforce lowercase and alphanumeric for PB
             const safeUsername = rawUsername.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -625,7 +685,7 @@
                     role: selectedRegRole,
                     keyNumber: keyNumber
                 });
-                
+
                 await pb.collection('users').authWithPassword(safeUsername, password);
                 setupProfileUI();
                 goToView('view-zone');
@@ -640,7 +700,7 @@
         async function executeLogin() {
             const rawUsername = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-pass').value;
-            
+
             const safeUsername = rawUsername.toLowerCase().replace(/[^a-z0-9]/g, '');
 
             if (!safeUsername || !password) return;
@@ -664,12 +724,12 @@
             const adminBtn = document.getElementById('admin-nav-btn');
             const logoutBtn = document.getElementById('logout-btn');
             const welcomeText = document.getElementById('idle-welcome-text');
-            
+
             if (pb.authStore.isValid && pb.authStore.model) {
                 const firstName = pb.authStore.model.name.split(' ')[0];
                 welcomeText.innerText = `Welcome back, ${firstName}`;
                 logoutBtn.style.display = 'block';
-                
+
                 if (pb.authStore.model.role === 'Admin') {
                     adminBtn.style.display = 'block';
                 } else {
@@ -715,7 +775,7 @@
             const ping = document.getElementById('door-ping');
             const dot = document.getElementById('door-dot');
             const text = document.getElementById('door-text');
-            
+
             if (!indicator) return;
 
             if (currentDoorStatus === 'Unlocked') {
@@ -1068,11 +1128,11 @@
                     filter: 'status = "Checked In"',
                     sort: '-created'
                 });
-                
+
                 const roster = document.getElementById('active-roster');
                 const adminRoster = document.getElementById('admin-roster');
                 const activeRecordId = localStorage.getItem('rfe_glass_record_id');
-                
+
                 if (records.items.length === 0) {
                     activeOccupantsText = "Empty";
                     roster.innerHTML = '<p class="text-sm text-gray-400 py-2 text-center">Facility is completely empty.</p>';
@@ -1186,7 +1246,7 @@
             } else {
                 goToView('view-idle');
             }
-            
+
             initDoorLogic();
             fetchBoard();
 
