@@ -550,9 +550,8 @@
 
         function playCheckInSound() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            // Deep, 2-note bass wind chime effect
-            playTone(130.81, 'sine', 2.5, 0.06, 0);      // C3
-            playTone(196.00, 'sine', 3.0, 0.04, 0.3);    // G3
+            playTone(523.25, 'sine', 0.8, 0.1, 0);      // C5
+            playTone(659.25, 'sine', 0.3, 0.1, 0.2);    // E5
         }
 
         function playCheckOutSound() {
