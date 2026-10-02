@@ -139,11 +139,6 @@
             background: #ffffff;
         }
 
-        .zone-icon-btn.warm-kitchen { border-bottom: 3px solid #F59E0B; }
-        .zone-icon-btn.warm-social { border-bottom: 3px solid #EC4899; }
-        .zone-icon-btn.warm-gym { border-bottom: 3px solid #ef4444; }
-        .zone-icon-btn.warm-bath { border-bottom: 3px solid #14B8A6; }
-        .zone-icon-btn.warm-class { border-bottom: 3px solid #10B981; }
 
         .role-btn { border: 2px solid #e5e7eb; transition: all 0.3s ease; }
 
@@ -181,16 +176,16 @@
         <div id="view-idle" class="view-state flex-col items-center w-full max-w-lg">
 
             <div id="idle-greeting-container" class="mb-10 text-center animate-[pulse_3s_ease-in-out_infinite] hidden">
-                <h2 id="idle-welcome-text" class="text-2xl font-light tracking-wide text-gray-800 drop-shadow-sm">Welcome back!</h2>
+                <h2 id="idle-welcome-text" class="text-2xl font-light tracking-wide text-slate-800  ">Welcome back!</h2>
             </div>
 
             <div class="flex flex-row space-x-6 w-full justify-center">
                 <button onclick="startCheckIn('member')" class="w-40 h-40 rounded-full flex flex-col items-center justify-center shadow-xl backdrop-blur-md active:scale-95 transition-all duration-300 btn-slate-pulse">
-                    <span class="text-2xl font-light tracking-tight text-slate-700 mb-1">Member</span>
+                    <span class="text-2xl font-light tracking-tight text-slate-800 mb-1">Member</span>
                 </button>
 
                 <button onclick="startCheckIn('guest')" class="w-40 h-40 rounded-full flex flex-col items-center justify-center shadow-xl backdrop-blur-md active:scale-95 transition-all duration-300 btn-slate-pulse">
-                    <span class="text-2xl font-light tracking-tight text-slate-700 mb-1">Guest</span>
+                    <span class="text-2xl font-light tracking-tight text-slate-800 mb-1">Guest</span>
                 </button>
             </div>
 
@@ -207,7 +202,7 @@
         <!-- VIEW CALENDAR -->
         <div id="view-calendar" class="view-state flex-col w-full max-w-md mx-auto">
             <div class="flex items-center mb-8">
-                <button onclick="goToView('view-idle')" class="w-12 h-12 rounded-full border-2 border-gray-200 flex items-center justify-center mr-4 active:bg-gray-50 text-xl">&larr;</button>
+                <button onclick="goToView('view-idle')" class="w-12 h-12 rounded-full border-2 border-slate-200 flex items-center justify-center mr-4 active:bg-gray-50 text-xl">&larr;</button>
                 <h2 class="text-2xl font-light tracking-tight">Facility Schedule</h2>
             </div>
 
@@ -264,8 +259,8 @@
         <!-- VIEW GUEST LOGIN -->
         <div id="view-guest-login" class="view-state flex-col w-full max-w-sm mx-auto glass-panel p-8 rounded-[2.5rem]">
             <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
-                <button onclick="goToView('view-idle')" class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center active:bg-gray-50 text-xl">&larr;</button>
-                <h2 class="text-xl font-bold text-gray-800 tracking-tight">Guest Access</h2>
+                <button onclick="goToView('view-idle')" class="w-10 h-10 rounded-full border-2 border-slate-200 flex items-center justify-center active:bg-gray-50 text-xl">&larr;</button>
+                <h2 class="text-xl font-bold text-slate-800 tracking-tight">Guest Access</h2>
                 <div class="w-10"></div> <!-- Spacer for centering -->
             </div>
 
@@ -279,33 +274,37 @@
         <!-- VIEW 3: Zone -->
         <div id="view-zone" class="view-state flex-col w-full max-w-md mx-auto">
             <div class="mb-10 text-center animate-[pulse_3s_ease-in-out_infinite]">
-                <h2 class="text-2xl font-light tracking-wide text-gray-800 drop-shadow-sm">Welcome! We're glad you're here.</h2>
+                <h2 class="text-2xl font-light tracking-wide text-slate-800  ">Welcome! We're glad you're here.</h2>
             </div>
             <div class="flex items-center mb-8">
-                <button onclick="goToView('view-idle')" class="w-12 h-12 rounded-full border-2 border-gray-200 flex items-center justify-center mr-4 active:bg-gray-50 text-xl">&larr;</button>
-                <h2 class="text-2xl font-light tracking-tight">Select Destination</h2>
+                <button onclick="goToView('view-idle')" class="w-12 h-12 rounded-full border-2 border-slate-200 flex items-center justify-center mr-4 active:bg-gray-50 text-xl">&larr;</button>
+                <h2 class="text-2xl font-light tracking-tight text-slate-800">Select Destination</h2>
             </div>
 
             <div class="grid grid-cols-2 gap-4 overflow-y-auto max-h-[70vh] pb-8 w-full px-1">
-                <div class="zone-icon-btn warm-kitchen bg-gradient-to-b from-orange-50/40 to-transparent" onclick="promptKeyCheck('Kitchen')">
-                    <span class="text-4xl mb-2">🍴</span>
-                    <h3 class="text-lg font-medium text-gray-900">Kitchen</h3>
+                <div class="zone-icon-btn bg-slate-50/50 hover:bg-slate-100" onclick="promptKeyCheck('Kitchen')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                    <h3 class="text-lg font-medium text-slate-800">Kitchen</h3>
                 </div>
-                <div class="zone-icon-btn warm-social bg-gradient-to-b from-pink-50/40 to-transparent" onclick="promptKeyCheck('Social Room')">
-                    <span class="text-4xl mb-2">🛋️</span>
-                    <h3 class="text-lg font-medium text-gray-900">Social Room</h3>
+                <div class="zone-icon-btn bg-slate-50/50 hover:bg-slate-100" onclick="promptKeyCheck('Social Room')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <h3 class="text-lg font-medium text-slate-800">Social Room</h3>
                 </div>
-                <div class="zone-icon-btn warm-bath bg-gradient-to-b from-teal-50/40 to-transparent" onclick="promptKeyCheck('Bathrooms')">
-                    <span class="text-4xl mb-2">🚻</span>
-                    <h3 class="text-lg font-medium text-gray-900">Bathrooms</h3>
+                <div class="zone-icon-btn bg-slate-50/50 hover:bg-slate-100" onclick="promptKeyCheck('Gym')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="text-lg font-medium text-slate-800">Gym</h3>
                 </div>
-                <div class="zone-icon-btn warm-gym bg-gradient-to-b from-red-50/40 to-transparent" onclick="promptKeyCheck('Gym')">
-                    <span class="text-4xl mb-2">🏀</span>
-                    <h3 class="text-lg font-medium text-gray-900">Gym</h3>
-                </div>
-                <div class="zone-icon-btn warm-class bg-gradient-to-b from-emerald-50/40 to-transparent col-span-2 mx-auto w-1/2" onclick="promptKeyCheck('Classrooms')">
-                    <span class="text-4xl mb-2">📚</span>
-                    <h3 class="text-lg font-medium text-gray-900">Classrooms</h3>
+                <div class="zone-icon-btn bg-slate-50/50 hover:bg-slate-100" onclick="promptKeyCheck('Classrooms')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <h3 class="text-lg font-medium text-slate-800">Classrooms</h3>
                 </div>
             </div>
         </div>
@@ -358,7 +357,7 @@
         <div id="view-admin" class="view-state flex-col w-full max-w-md mx-auto">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center">
-                    <button onclick="goToView('view-idle')" class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center mr-3 active:bg-gray-50">&larr;</button>
+                    <button onclick="goToView('view-idle')" class="w-10 h-10 rounded-full border-2 border-slate-200 flex items-center justify-center mr-3 active:bg-gray-50">&larr;</button>
                     <h2 class="text-2xl font-light tracking-tight">Admin Console</h2>
                 </div>
                 <button onclick="forceAllOut()" class="text-xs font-bold bg-red-50 text-red-600 px-4 py-2 rounded-full border border-red-200 shadow-sm active:scale-95 transition">Evict All</button>
@@ -425,28 +424,28 @@
             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-4 mb-3">Select Zones Required</p>
             <div class="grid grid-cols-4 gap-4 mb-8">
                 <!-- Zone Toggles -->
-                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-gray-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Kitchen" onclick="toggleZoneBtn(this)">
+                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-slate-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Kitchen" onclick="toggleZoneBtn(this)">
                     <span class="text-2xl mb-1">🍴</span><span class="text-[9px] font-bold uppercase">Kitchen</span>
                 </button>
-                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-gray-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Bathrooms" onclick="toggleZoneBtn(this)">
+                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-slate-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Bathrooms" onclick="toggleZoneBtn(this)">
                     <span class="text-2xl mb-1">🚻</span><span class="text-[9px] font-bold uppercase">Bathrooms</span>
                 </button>
-                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-gray-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Gym" onclick="toggleZoneBtn(this)">
+                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-slate-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Gym" onclick="toggleZoneBtn(this)">
                     <span class="text-2xl mb-1">🏀</span><span class="text-[9px] font-bold uppercase">Gym</span>
                 </button>
-                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-gray-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Social Room" onclick="toggleZoneBtn(this)">
+                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-slate-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Social Room" onclick="toggleZoneBtn(this)">
                     <span class="text-2xl mb-1">🛋️</span><span class="text-[9px] font-bold uppercase">Social</span>
                 </button>
-                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-gray-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Office" onclick="toggleZoneBtn(this)">
+                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-slate-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Office" onclick="toggleZoneBtn(this)">
                     <span class="text-2xl mb-1">📋</span><span class="text-[9px] font-bold uppercase">Office</span>
                 </button>
-                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-gray-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Classroom" onclick="toggleZoneBtn(this)">
+                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-slate-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Classroom" onclick="toggleZoneBtn(this)">
                     <span class="text-2xl mb-1">📚</span><span class="text-[9px] font-bold uppercase">Class</span>
                 </button>
-                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-gray-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Stairway" onclick="toggleZoneBtn(this)">
+                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-slate-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Stairway" onclick="toggleZoneBtn(this)">
                     <span class="text-2xl mb-1">🪜</span><span class="text-[9px] font-bold uppercase">Stairs</span>
                 </button>
-                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-gray-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Principal's Office" onclick="toggleZoneBtn(this)">
+                <button type="button" class="zone-toggle flex flex-col items-center justify-center p-3 rounded-full border border-slate-200 transition-all text-gray-400 hover:bg-gray-50 active:scale-95" data-zone="Principal's Office" onclick="toggleZoneBtn(this)">
                     <span class="text-2xl mb-1">🎓</span><span class="text-[9px] font-bold uppercase">Principal</span>
                 </button>
             </div>
@@ -1248,7 +1247,7 @@
                                         <div class="flex justify-between items-center p-4 bg-white rounded-3xl border-2 ${auraClass} shadow-sm transition-all" onclick="acknowledgeUser('${log.id}', this)">
                                             <div class="flex-grow">
                                                 <p class="font-bold text-gray-900 text-lg flex items-center">
-                                                    ${log.name}${isMe ? '<span class="text-[10px] font-bold text-gray-400 ml-2 border border-gray-200 px-2 rounded-full">(You)</span>' : ''}
+                                                    ${log.name}${isMe ? '<span class="text-[10px] font-bold text-gray-400 ml-2 border border-slate-200 px-2 rounded-full">(You)</span>' : ''}
                                                 </p>
                                                 <div class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">${log.role}</div>
                                             </div>
