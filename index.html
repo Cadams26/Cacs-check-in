@@ -312,12 +312,12 @@
         <!-- VIEW 4: Active -->
         <div id="view-active" class="view-state flex-col w-full max-w-md mx-auto mt-[-4vh]">
             <div class="flex flex-col items-center mb-6">
-                <button id="depart-btn" onclick="processCheckOut()" class="circle-btn aura-black mb-4" style="width: 14rem; height: 14rem; background: rgba(26, 26, 46, 0.9); color: white;">
-                    <span class="text-3xl font-light tracking-tight">Depart</span>
-                    <span class="text-xs font-medium text-gray-400 mt-2">Tap to check out</span>
+                <button id="depart-btn" onclick="processCheckOut(true)" class="circle-btn mb-6 shadow-xl backdrop-blur-md active:scale-95 transition-all duration-300 btn-slate-pulse" style="width: 14rem; height: 14rem;">
+                    <span class="text-3xl font-light tracking-tight text-slate-700">Depart</span>
+                    <span class="text-xs font-medium text-slate-400 mt-2 uppercase tracking-widest">Tap to check out</span>
                 </button>
-                <button onclick="processCheckOut(true)" class="text-xs font-bold text-gray-400 hover:text-gray-600 uppercase tracking-widest transition-colors py-2 px-4 rounded-full border border-transparent hover:border-gray-200">
-                    Depart & Sign Out
+                <button onclick="processCheckOut(false)" class="text-xs font-bold text-slate-500 hover:text-slate-700 uppercase tracking-widest transition-all duration-300 py-3 px-6 rounded-full border border-slate-200 bg-white/50 backdrop-blur-md shadow-sm active:scale-95">
+                    Depart & Save Info
                 </button>
             </div>
 
@@ -338,7 +338,7 @@
 
         <!-- Version Indicator -->
         <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
-            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.03</span>
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.04</span>
         </div>
 
         <!-- ADMIN LOGIN OVERLAY -->
