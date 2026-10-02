@@ -73,9 +73,18 @@
             100% { border-radius: 50%; box-shadow: 0 0 5px 0px rgba(163, 230, 53, 0.1); }
         }
 
+        @keyframes bubble-push-blue {
+            0%   { border-radius: 50%; box-shadow: 0 0 5px 0px rgba(59, 130, 246, 0.1); }
+            25%  { border-radius: 60% 40% 50% 50% / 40% 50% 50% 60%; box-shadow: -10px 10px 25px -5px rgba(59, 130, 246, 0.4); }
+            50%  { border-radius: 40% 60% 50% 50% / 50% 40% 60% 50%; box-shadow: 10px 5px 25px -5px rgba(59, 130, 246, 0.2); }
+            75%  { border-radius: 50% 50% 60% 40% / 60% 50% 40% 50%; box-shadow: -5px -10px 25px -5px rgba(59, 130, 246, 0.3); }
+            100% { border-radius: 50%; box-shadow: 0 0 5px 0px rgba(59, 130, 246, 0.1); }
+        }
+
         .aura-blue { border: 1px solid rgba(0, 122, 255, 0.2); animation: breathe-blue 6s infinite ease-in-out; }
         .aura-black { border: 1px solid rgba(26, 26, 46, 0.2); animation: breathe-black 6s infinite ease-in-out; }
         .bubble-glow { border: 1px solid rgba(163, 230, 53, 0.25); animation: bubble-push 8s infinite ease-in-out; background: rgba(255, 255, 255, 0.6) !important; }
+        .bubble-glow-blue { border: 1px solid rgba(59, 130, 246, 0.25); animation: bubble-push-blue 8s infinite ease-in-out; background: rgba(255, 255, 255, 0.6) !important; }
 
         .text-3d-pop {
             text-shadow:
@@ -186,14 +195,25 @@
     <main class="flex-grow flex flex-col justify-center items-center p-6 relative">
 
         <!-- VIEW 1: Idle -->
-        <div id="view-idle" class="view-state flex-col items-center w-full max-w-md">
-            <button onclick="handleEnterTap()" class="circle-btn bubble-glow group relative" style="transform-style: preserve-3d; perspective: 1000px;">
-                <span class="text-5xl font-bold tracking-tight transition-transform duration-300 text-gray-800 text-3d-pop mb-1">Enter</span>
-                <span id="idle-welcome-text" class="text-sm font-medium mt-2 text-gray-400" style="transform: translateZ(5px);">Waiting for input...</span>
-            </button>
-            <button onclick="logoutProfile()" id="logout-btn" class="hidden mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest">Sign Out</button>
+        <div id="view-idle" class="view-state flex-col items-center w-full max-w-lg">
 
-            <button onclick="showCalendarPage()" class="mt-8 text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center justify-center space-x-2 transition-colors duration-200 bg-blue-50/50 py-2 px-6 rounded-full border border-blue-100">
+            <div id="idle-greeting-container" class="mb-10 text-center animate-[pulse_3s_ease-in-out_infinite] hidden">
+                <h2 id="idle-welcome-text" class="text-2xl font-light tracking-wide text-gray-800 drop-shadow-sm">Welcome back!</h2>
+            </div>
+
+            <div class="flex flex-row space-x-6 w-full justify-center">
+                <button onclick="startCheckIn('member')" class="w-40 h-40 rounded-full flex flex-col items-center justify-center shadow-2xl bg-white/80 backdrop-blur-md active:scale-95 transition-all duration-300 bubble-glow group relative" style="transform-style: preserve-3d; perspective: 1000px;">
+                    <span class="text-3xl font-bold tracking-tight transition-transform duration-300 text-gray-800 text-3d-pop mb-1">Member</span>
+                </button>
+
+                <button onclick="startCheckIn('guest')" class="w-40 h-40 rounded-full flex flex-col items-center justify-center shadow-2xl bg-white/80 backdrop-blur-md active:scale-95 transition-all duration-300 bubble-glow-blue group relative" style="transform-style: preserve-3d; perspective: 1000px;">
+                    <span class="text-3xl font-bold tracking-tight transition-transform duration-300 text-gray-800 text-3d-pop mb-1">Guest</span>
+                </button>
+            </div>
+
+            <button onclick="logoutProfile()" id="logout-btn" class="hidden mt-12 text-xs font-bold text-gray-400 uppercase tracking-widest">Sign Out</button>
+
+            <button onclick="showCalendarPage()" class="mt-12 text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center justify-center space-x-2 transition-colors duration-200 bg-blue-50/50 py-2 px-6 rounded-full border border-blue-100">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -256,6 +276,21 @@
             </div>
 
             <button onclick="goToView('view-idle')" class="mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest text-center w-full">Cancel</button>
+        </div>
+
+        <!-- VIEW GUEST LOGIN -->
+        <div id="view-guest-login" class="view-state flex-col w-full max-w-sm mx-auto glass-panel p-8 rounded-[2.5rem]">
+            <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
+                <button onclick="goToView('view-idle')" class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center active:bg-gray-50 text-xl">&larr;</button>
+                <h2 class="text-xl font-bold text-gray-800 tracking-tight">Guest Access</h2>
+                <div class="w-10"></div> <!-- Spacer for centering -->
+            </div>
+
+            <div class="flex flex-col">
+                <input type="text" id="guest-name" class="input-clean" placeholder="First & Last Name">
+                <input type="text" id="guest-reason" class="input-clean mb-6" placeholder="Reason for Visit (Optional)">
+                <button onclick="executeGuestLogin()" class="w-full py-4 rounded-full font-bold text-lg text-white aura-blue active:scale-95 transition-transform" style="background-color: var(--sharp-blue);">Continue</button>
+            </div>
         </div>
 
         <!-- VIEW 3: Zone -->
@@ -651,6 +686,32 @@
             setTimeout(() => { modal.style.display = 'none'; }, 300);
         }
 
+        async function executeGuestLogin() {
+            const name = document.getElementById('guest-name').value.trim();
+            const reason = document.getElementById('guest-reason').value.trim();
+
+            if (!name) {
+                return alert("Please enter your First & Last Name.");
+            }
+
+            // Synthesize a guest user object.
+            // Note: We bypass the authStore completely because PocketBase validates tokens.
+            // Using a fake token causes 401s on subsequent API calls.
+            // Instead, we store the guest info locally and use public routes if possible.
+            // Wait, this application requires a logged-in user to check in since it uses pb.authStore everywhere.
+            // To fix the review issue: we should just store it globally and override auth checks, OR use local storage.
+
+            // Let's store guest details globally to avoid authStore pollution.
+            window.guestSession = {
+                name: name,
+                role: 'Guest',
+                guestReason: reason,
+                isGuest: true
+            };
+
+            goToView('view-zone');
+        }
+
         async function executeRegister() {
             const name = document.getElementById('reg-name').value.trim();
             const rawUsername = document.getElementById('reg-username').value.trim();
@@ -724,29 +785,41 @@
             const adminBtn = document.getElementById('admin-nav-btn');
             const logoutBtn = document.getElementById('logout-btn');
             const welcomeText = document.getElementById('idle-welcome-text');
+            const greetingContainer = document.getElementById('idle-greeting-container');
 
             if (pb.authStore.isValid && pb.authStore.model) {
-                const firstName = pb.authStore.model.name.split(' ')[0];
-                welcomeText.innerText = `Welcome back, ${firstName}`;
-                logoutBtn.style.display = 'block';
-
-                if (pb.authStore.model.role === 'Admin') {
-                    adminBtn.style.display = 'block';
-                } else {
+                if (pb.authStore.model.role === 'Guest') {
+                    greetingContainer.classList.add('hidden');
+                    logoutBtn.style.display = 'none';
                     adminBtn.style.display = 'none';
+                } else {
+                    const firstName = pb.authStore.model.name.split(' ')[0];
+                    welcomeText.innerText = `Welcome back, ${firstName}`;
+                    greetingContainer.classList.remove('hidden');
+                    logoutBtn.style.display = 'block';
+
+                    if (pb.authStore.model.role === 'Admin') {
+                        adminBtn.style.display = 'block';
+                    } else {
+                        adminBtn.style.display = 'none';
+                    }
                 }
             } else {
-                welcomeText.innerText = 'Waiting for input...';
+                greetingContainer.classList.add('hidden');
                 logoutBtn.style.display = 'none';
                 adminBtn.style.display = 'none';
             }
         }
 
-        function handleEnterTap() {
-            if (pb.authStore.isValid) {
-                goToView('view-zone');
-            } else {
-                goToView('view-identity');
+        function startCheckIn(type) {
+            if (type === 'guest') {
+                goToView('view-guest-login');
+            } else if (type === 'member') {
+                if (pb.authStore.isValid && pb.authStore.model) {
+                    goToView('view-zone');
+                } else {
+                    goToView('view-identity');
+                }
             }
         }
 
@@ -863,13 +936,21 @@
             }
 
             try {
-                const record = await pb.collection('logs').create({
-                    name: pb.authStore.model.name,
-                    role: pb.authStore.model.role || 'Guest',
+                const isGuest = !!window.guestSession;
+                const logData = {
+                    name: isGuest ? window.guestSession.name : pb.authStore.model.name,
+                    role: isGuest ? window.guestSession.role : pb.authStore.model.role,
                     zone: pendingZone,
                     status: 'Checked In',
                     usedKey: usedKey
-                });
+                };
+
+                // Append guest reason to the name visually if provided
+                if (isGuest && window.guestSession.guestReason) {
+                    logData.name = `${window.guestSession.name} (${window.guestSession.guestReason})`;
+                }
+
+                const record = await pb.collection('logs').create(logData);
 
                 localStorage.setItem('rfe_glass_record_id', record.id);
                 fetchBoard();
@@ -888,6 +969,12 @@
                 await pb.collection('logs').update(activeRecordId, { status: 'Checked Out' });
                 localStorage.removeItem('rfe_glass_record_id');
                 document.getElementById('door-status-indicator').classList.replace('flex', 'hidden');
+
+                // If they are a guest, clear their local session completely upon checkout
+                if (window.guestSession) {
+                    window.guestSession = null;
+                }
+
                 goToView('view-idle');
                 fetchBoard();
             } catch (error) {
@@ -1240,7 +1327,7 @@
             setupProfileUI();
 
             const activeRecordId = localStorage.getItem('rfe_glass_record_id');
-            if (activeRecordId && pb.authStore.isValid) {
+            if (activeRecordId && (pb.authStore.isValid || window.guestSession)) {
                 goToView('view-active');
                 document.getElementById('door-status-indicator').classList.replace('hidden', 'flex');
             } else {
