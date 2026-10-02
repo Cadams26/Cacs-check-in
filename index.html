@@ -180,11 +180,11 @@
             </div>
 
             <div class="flex flex-row space-x-6 w-full justify-center">
-                <button onclick="startCheckIn('member')" class="w-40 h-40 rounded-full flex flex-col items-center justify-center shadow-xl backdrop-blur-md active:scale-95 transition-all duration-300 btn-slate-pulse">
-                    <span class="text-2xl font-light tracking-tight text-slate-800 mb-1">Member</span>
+                <button id="btn-idle-member" onclick="startCheckIn('member')" class="w-40 h-40 rounded-full flex flex-col items-center justify-center shadow-xl backdrop-blur-md active:scale-95 transition-all duration-300 btn-slate-pulse">
+                    <span id="txt-idle-member" class="text-2xl font-light tracking-tight text-slate-800 mb-1 text-center leading-tight">Member</span>
                 </button>
 
-                <button onclick="startCheckIn('guest')" class="w-40 h-40 rounded-full flex flex-col items-center justify-center shadow-xl backdrop-blur-md active:scale-95 transition-all duration-300 btn-slate-pulse">
+                <button id="btn-idle-guest" onclick="startCheckIn('guest')" class="w-40 h-40 rounded-full flex flex-col items-center justify-center shadow-xl backdrop-blur-md active:scale-95 transition-all duration-300 btn-slate-pulse">
                     <span class="text-2xl font-light tracking-tight text-slate-800 mb-1">Guest</span>
                 </button>
             </div>
@@ -311,10 +311,13 @@
 
         <!-- VIEW 4: Active -->
         <div id="view-active" class="view-state flex-col w-full max-w-md mx-auto mt-[-4vh]">
-            <div class="flex justify-center mb-6">
-                <button id="depart-btn" onclick="processCheckOut()" class="circle-btn aura-black" style="width: 14rem; height: 14rem; background: rgba(26, 26, 46, 0.9); color: white;">
+            <div class="flex flex-col items-center mb-6">
+                <button id="depart-btn" onclick="processCheckOut()" class="circle-btn aura-black mb-4" style="width: 14rem; height: 14rem; background: rgba(26, 26, 46, 0.9); color: white;">
                     <span class="text-3xl font-light tracking-tight">Depart</span>
                     <span class="text-xs font-medium text-gray-400 mt-2">Tap to check out</span>
+                </button>
+                <button onclick="processCheckOut(true)" class="text-xs font-bold text-gray-400 hover:text-gray-600 uppercase tracking-widest transition-colors py-2 px-4 rounded-full border border-transparent hover:border-gray-200">
+                    Depart & Sign Out
                 </button>
             </div>
 
@@ -335,7 +338,7 @@
 
         <!-- Version Indicator -->
         <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
-            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.02</span>
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.03</span>
         </div>
 
         <!-- ADMIN LOGIN OVERLAY -->
@@ -550,8 +553,9 @@
 
         function playCheckInSound() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            playTone(523.25, 'sine', 0.8, 0.1, 0);      // C5
-            playTone(659.25, 'sine', 0.3, 0.1, 0.2);    // E5
+            // A warm, satisfying "unlock" interval (Perfect 4th: D4 -> G4) with a soft release
+            playTone(293.66, 'sine', 0.7, 0.15, 0);     // D4
+            playTone(392.00, 'sine', 1.0, 0.2, 0.15);   // G4
         }
 
         function playCheckOutSound() {
@@ -769,16 +773,25 @@
             const welcomeText = document.getElementById('idle-welcome-text');
             const greetingContainer = document.getElementById('idle-greeting-container');
 
+            const btnMember = document.getElementById('btn-idle-member');
+            const txtMember = document.getElementById('txt-idle-member');
+            const btnGuest = document.getElementById('btn-idle-guest');
+
             if (pb.authStore.isValid && pb.authStore.model) {
                 if (pb.authStore.model.role === 'Guest') {
                     greetingContainer.classList.add('hidden');
                     logoutBtn.style.display = 'none';
                     adminBtn.style.display = 'none';
+                    btnGuest.style.display = 'flex';
+                    txtMember.innerHTML = 'Member';
                 } else {
                     const firstName = pb.authStore.model.name.split(' ')[0];
                     welcomeText.innerText = `Welcome back, ${firstName}`;
                     greetingContainer.classList.remove('hidden');
                     logoutBtn.style.display = 'block';
+
+                    btnGuest.style.display = 'none';
+                    txtMember.innerHTML = `Check In As<br><span class="font-bold">${firstName}</span>`;
 
                     if (pb.authStore.model.role === 'Admin') {
                         adminBtn.style.display = 'block';
@@ -790,6 +803,8 @@
                 greetingContainer.classList.add('hidden');
                 logoutBtn.style.display = 'none';
                 adminBtn.style.display = 'none';
+                btnGuest.style.display = 'flex';
+                txtMember.innerHTML = 'Member';
             }
         }
 
@@ -942,7 +957,7 @@
             }
         }
 
-        async function processCheckOut() {
+        async function processCheckOut(signOutAfter = false) {
             playCheckOutSound();
             const activeRecordId = localStorage.getItem('rfe_glass_record_id');
             if (!activeRecordId) return goToView('view-idle');
@@ -956,6 +971,11 @@
                 if (window.guestSession) {
                     window.guestSession = null;
                     localStorage.removeItem('rfe_guest_session');
+                }
+
+                if (signOutAfter) {
+                    pb.authStore.clear();
+                    setupProfileUI();
                 }
 
                 goToView('view-idle');
