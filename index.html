@@ -127,32 +127,31 @@
             box-shadow: 0 10px 10px -10px var(--glow-color);
         }
 
-        .zone-pill {
-            background: var(--glass-bg);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.8);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-            border-radius: 2rem;
-            padding: 1.5rem 2rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .zone-icon-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+            padding: 1.25rem 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
-        .zone-pill:hover, .zone-pill:active {
-            transform: scale(0.98) translateY(-2px);
-            border-color: rgba(0, 122, 255, 0.3);
-            box-shadow: 0 8px 25px var(--glow-color);
+        .zone-icon-btn:hover, .zone-icon-btn:active {
+            transform: translateY(-2px) scale(0.95);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+            background: #ffffff;
         }
 
-        .zone-pill.warm-kitchen { border-left: 4px solid #F59E0B; }
-        .zone-pill.warm-social { border-left: 4px solid #EC4899; }
-        .zone-pill.warm-gym { border-left: 4px solid #ef4444; }
-        .zone-pill.warm-office { border-left: 4px solid #3B82F6; }
-        .zone-pill.warm-stairway { border-left: 4px solid #8B5CF6; }
-        .zone-pill.warm-hallway { border-left: 4px solid #14B8A6; }
-        .zone-pill.warm-class { border-left: 4px solid #10B981; }
-        .zone-pill.warm-principal { border-left: 4px solid #0F766E; }
+        .zone-icon-btn.warm-kitchen { border-bottom: 3px solid #F59E0B; }
+        .zone-icon-btn.warm-social { border-bottom: 3px solid #EC4899; }
+        .zone-icon-btn.warm-gym { border-bottom: 3px solid #ef4444; }
+        .zone-icon-btn.warm-bath { border-bottom: 3px solid #14B8A6; }
+        .zone-icon-btn.warm-class { border-bottom: 3px solid #10B981; }
 
         .role-btn { border: 2px solid #e5e7eb; transition: all 0.3s ease; }
         
@@ -257,54 +256,26 @@
                 <h2 class="text-2xl font-light tracking-tight">Select Destination</h2>
             </div>
 
-            <div class="space-y-2 overflow-y-auto max-h-[70vh] pb-8 w-full px-1">
-                <div class="zone-pill warm-kitchen bg-gradient-to-r from-orange-50/40 to-transparent" onclick="promptKeyCheck('Kitchen')">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-medium text-gray-900 flex items-center">☕ Kitchen</h3>
-                    </div>
-                    <p class="text-sm text-gray-500">Meal prep and dining area.</p>
+            <div class="grid grid-cols-2 gap-4 overflow-y-auto max-h-[70vh] pb-8 w-full px-1">
+                <div class="zone-icon-btn warm-kitchen bg-gradient-to-b from-orange-50/40 to-transparent" onclick="promptKeyCheck('Kitchen')">
+                    <span class="text-4xl mb-2">🍴</span>
+                    <h3 class="text-lg font-medium text-gray-900">Kitchen</h3>
                 </div>
-                <div class="zone-pill warm-social bg-gradient-to-r from-pink-50/40 to-transparent" onclick="promptKeyCheck('Social Room')">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-medium text-gray-900 flex items-center">🛋️ Social Room</h3>
-                    </div>
-                    <p class="text-sm text-gray-500">Relax, gather, and connect.</p>
+                <div class="zone-icon-btn warm-social bg-gradient-to-b from-pink-50/40 to-transparent" onclick="promptKeyCheck('Social Room')">
+                    <span class="text-4xl mb-2">🛋️</span>
+                    <h3 class="text-lg font-medium text-gray-900">Social Room</h3>
                 </div>
-                <div class="zone-pill warm-gym bg-gradient-to-r from-red-50/40 to-transparent" onclick="promptKeyCheck('Main Gymnasium')">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-medium text-gray-900 flex items-center">🏀 Main Gymnasium</h3>
-                    </div>
-                    <p class="text-sm text-gray-500">Open sports, athletics, and equipment.</p>
+                <div class="zone-icon-btn warm-bath bg-gradient-to-b from-teal-50/40 to-transparent" onclick="promptKeyCheck('Bathrooms')">
+                    <span class="text-4xl mb-2">🚻</span>
+                    <h3 class="text-lg font-medium text-gray-900">Bathrooms</h3>
                 </div>
-                <div class="zone-pill warm-office bg-gradient-to-r from-blue-50/40 to-transparent" onclick="promptKeyCheck('Main Office')">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-medium text-gray-900 flex items-center">📋 Main Office</h3>
-                    </div>
-                    <p class="text-sm text-gray-500">Administration and front desk.</p>
+                <div class="zone-icon-btn warm-gym bg-gradient-to-b from-red-50/40 to-transparent" onclick="promptKeyCheck('Gym')">
+                    <span class="text-4xl mb-2">🏀</span>
+                    <h3 class="text-lg font-medium text-gray-900">Gym</h3>
                 </div>
-                <div class="zone-pill warm-stairway bg-gradient-to-r from-purple-50/40 to-transparent" onclick="promptKeyCheck('Stairway Entry')">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-medium text-gray-900 flex items-center">🪜 Stairway Entry</h3>
-                    </div>
-                    <p class="text-sm text-gray-500">Main thoroughfare and access point.</p>
-                </div>
-                <div class="zone-pill warm-hallway bg-gradient-to-r from-teal-50/40 to-transparent" onclick="promptKeyCheck('Hallways & Washrooms')">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-medium text-gray-900 flex items-center">💧 Hallways & Washrooms</h3>
-                    </div>
-                    <p class="text-sm text-gray-500">Connecting corridors and facilities.</p>
-                </div>
-                <div class="zone-pill warm-class bg-gradient-to-r from-emerald-50/40 to-transparent" onclick="promptKeyCheck('Main Classroom')">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-medium text-gray-900 flex items-center">📚 Main Classroom</h3>
-                    </div>
-                    <p class="text-sm text-gray-500">Quiet study and instructional space.</p>
-                </div>
-                <div class="zone-pill warm-principal bg-gradient-to-r from-cyan-50/40 to-transparent" onclick="promptKeyCheck('Principal\'s Office / Classroom')">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-medium text-gray-900 flex items-center">🎓 Principal's Office</h3>
-                    </div>
-                    <p class="text-sm text-gray-500">Leadership and focused meetings.</p>
+                <div class="zone-icon-btn warm-class bg-gradient-to-b from-emerald-50/40 to-transparent col-span-2 mx-auto w-1/2" onclick="promptKeyCheck('Classrooms')">
+                    <span class="text-4xl mb-2">📚</span>
+                    <h3 class="text-lg font-medium text-gray-900">Classrooms</h3>
                 </div>
             </div>
         </div>
@@ -535,7 +506,7 @@
 
         document.addEventListener('click', (e) => {
             const isButton = e.target.tagName === 'BUTTON' || e.target.closest('button');
-            const isZone = e.target.classList && e.target.classList.contains('zone-pill') || e.target.closest('.zone-pill');
+            const isZone = e.target.classList && e.target.classList.contains('zone-icon-btn') || e.target.closest('.zone-icon-btn');
             if (isButton || isZone) {
                 playClickSound();
             }
