@@ -322,8 +322,9 @@
 
             <div class="flex justify-center mb-8 px-4">
                 <button id="door-toggle-btn" onclick="toggleDoor()" class="w-full max-w-[200px] py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-300 border shadow-sm glass-panel">
-                    Connecting to door...
+                    Loading reported door status...
                 </button>
+                <p class="mt-3 max-w-xs text-center text-xs text-gray-500">This records the door status only; it does not operate the lock. Before leaving, physically lock the door if you are the last person out, then report it here.</p>
             </div>
 
             <div class="glass-panel rounded-[2.5rem] p-6 max-h-[40vh] overflow-y-auto">
@@ -337,7 +338,7 @@
 
         <!-- Version Indicator -->
         <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
-            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.05</span>
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.06</span>
         </div>
 
         <!-- ADMIN LOGIN OVERLAY -->
@@ -847,7 +848,7 @@
                 ping.style.backgroundColor = '#EF4444'; dot.style.backgroundColor = '#EF4444';
             }
 
-            text.innerText = `${activeOccupantsText} • ${currentDoorStatus.toUpperCase()}`;
+            text.innerText = `${activeOccupantsText} • REPORTED ${currentDoorStatus.toUpperCase()}`;
         }
 
         function updateDoorUI() {
@@ -855,10 +856,10 @@
 
             if (toggleBtn) {
                 if (currentDoorStatus === 'Unlocked') {
-                    toggleBtn.innerHTML = '🔓 Door Unlocked - Tap to Lock';
+                    toggleBtn.innerHTML = '🔓 Reported unlocked • I locked it';
                     toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-green-50 text-green-700 border border-green-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)]';
                 } else {
-                    toggleBtn.innerHTML = '🔒 Door Locked - Tap to Unlock';
+                    toggleBtn.innerHTML = '🔒 Reported locked • I unlocked it';
                     toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-red-50 text-red-700 border border-red-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)]';
                 }
             }
@@ -869,6 +870,7 @@
         async function toggleDoor() {
             if (!doorRecordId) return;
             const newStatus = currentDoorStatus === 'Locked' ? 'Unlocked' : 'Locked';
+            if (!confirm(`Have you physically ${newStatus.toLowerCase()} the door? This only updates the reported status.`)) return;
             currentDoorStatus = newStatus;
             updateDoorUI();
             try {
@@ -876,7 +878,7 @@
             } catch (err) {
                 currentDoorStatus = newStatus === 'Locked' ? 'Unlocked' : 'Locked';
                 updateDoorUI();
-                alert("Failed to communicate with door system.");
+                alert("Could not save the reported door status. Please try again.");
             }
         }
 
