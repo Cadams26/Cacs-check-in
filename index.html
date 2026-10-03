@@ -337,7 +337,7 @@
 
         <!-- Version Indicator -->
         <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
-            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.07</span>
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.10</span>
         </div>
 
         <!-- ADMIN LOGIN OVERLAY -->
@@ -496,14 +496,14 @@
             <h3 class="text-2xl font-light tracking-tight mb-2 text-center text-gray-900">Facility Access</h3>
             <p class="text-sm text-gray-400 text-center mb-8">Did you use a physical key to unlock the building today?</p>
 
-            <div id="responsibility-notice" class="hidden w-full bg-blue-50 border border-blue-100 rounded-3xl p-5 mb-6">
-                <p class="text-xs font-bold uppercase tracking-widest text-blue-600 mb-2">Security Notice</p>
-                <p class="text-sm text-blue-900 font-medium">As a keyholder, you are explicitly responsible for ensuring the facility is locked and secured when you depart.</p>
+            <div id="responsibility-notice" class="hidden w-full glass-panel bg-white/50 border border-white/70 rounded-3xl p-5 mb-6 shadow-sm">
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Security Notice</p>
+                <p class="text-sm text-slate-700 font-medium leading-relaxed">As a keyholder, you are explicitly responsible for ensuring the facility is locked and secured when you depart.</p>
             </div>
 
             <button id="btn-no-key" onclick="executeCheckIn(false)" class="w-full py-4 rounded-full font-bold text-lg bg-gray-100 text-gray-900 active:scale-95 transition-transform mb-3">No, walked in</button>
             <button id="btn-yes-key" onclick="showResponsibility()" class="w-full py-4 rounded-full font-bold text-lg bg-black text-white active:scale-95 transition-transform">Yes, used a key</button>
-            <button id="btn-accept-key" onclick="executeCheckIn(true)" class="hidden w-full py-4 rounded-full font-bold text-lg text-white active:scale-95 transition-transform aura-blue" style="background-color: var(--sharp-blue);">Accept & Continue</button>
+            <button id="btn-accept-key" onclick="executeCheckIn(true)" class="hidden w-full py-4 rounded-full font-bold text-lg text-slate-800 glass-panel bg-white/70 border border-white/80 shadow-sm hover:bg-white/90 active:scale-95 transition-all">Accept & Continue</button>
 
             <button onclick="closeKeyModal()" class="mt-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Cancel</button>
         </div>
@@ -840,14 +840,15 @@
             if (!indicator) return;
 
             if (currentDoorStatus === 'Unlocked') {
+                indicator.style.color = '#F59E0B';
+                ping.style.backgroundColor = '#F59E0B'; dot.style.backgroundColor = '#F59E0B';
+            } else {
                 indicator.style.color = '#10B981';
                 ping.style.backgroundColor = '#10B981'; dot.style.backgroundColor = '#10B981';
-            } else {
-                indicator.style.color = '#EF4444';
-                ping.style.backgroundColor = '#EF4444'; dot.style.backgroundColor = '#EF4444';
             }
 
-            text.innerText = `${activeOccupantsText} • REPORTED ${currentDoorStatus.toUpperCase()}`;
+            const lockIcon = currentDoorStatus === 'Locked' ? '🔒' : '🔓';
+            text.innerText = `${activeOccupantsText} • ${lockIcon} REPORTED ${currentDoorStatus.toUpperCase()}`;
         }
 
         function updateDoorUI() {
@@ -855,11 +856,11 @@
 
             if (toggleBtn) {
                 if (currentDoorStatus === 'Unlocked') {
-                    toggleBtn.innerHTML = '🔒 Yay, I locked the door';
-                    toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-green-50 text-green-700 border border-green-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)]';
+                    toggleBtn.innerHTML = '<span class="block mb-1">🔓 Reported unlocked</span>Yay, I locked the door';
+                    toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-amber-50 text-amber-700 border border-amber-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(245,158,11,0.4)]';
                 } else {
-                    toggleBtn.innerHTML = '🔓 I unlocked the door';
-                    toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-red-50 text-red-700 border border-red-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)]';
+                    toggleBtn.innerHTML = '<span class="block mb-1">🔒 Reported locked</span>I unlocked the door';
+                    toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-green-50 text-green-700 border border-green-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)]';
                 }
             }
 
