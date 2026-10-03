@@ -337,7 +337,7 @@
 
         <!-- Version Indicator -->
         <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
-            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.08</span>
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.09</span>
         </div>
 
         <!-- ADMIN LOGIN OVERLAY -->
@@ -840,14 +840,15 @@
             if (!indicator) return;
 
             if (currentDoorStatus === 'Unlocked') {
-                indicator.style.color = '#EF4444';
-                ping.style.backgroundColor = '#EF4444'; dot.style.backgroundColor = '#EF4444';
+                indicator.style.color = '#F59E0B';
+                ping.style.backgroundColor = '#F59E0B'; dot.style.backgroundColor = '#F59E0B';
             } else {
                 indicator.style.color = '#10B981';
                 ping.style.backgroundColor = '#10B981'; dot.style.backgroundColor = '#10B981';
             }
 
-            text.innerText = `${activeOccupantsText} • REPORTED ${currentDoorStatus.toUpperCase()}`;
+            const lockIcon = currentDoorStatus === 'Locked' ? '🔒' : '🔓';
+            text.innerText = `${activeOccupantsText} • ${lockIcon} REPORTED ${currentDoorStatus.toUpperCase()}`;
         }
 
         function updateDoorUI() {
@@ -855,10 +856,10 @@
 
             if (toggleBtn) {
                 if (currentDoorStatus === 'Unlocked') {
-                    toggleBtn.innerHTML = '🔒 Yay, I locked the door';
-                    toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-red-50 text-red-700 border border-red-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)]';
+                    toggleBtn.innerHTML = '<span class="block mb-1">🔓 Reported unlocked</span>Yay, I locked the door';
+                    toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-amber-50 text-amber-700 border border-amber-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(245,158,11,0.4)]';
                 } else {
-                    toggleBtn.innerHTML = '🔓 I unlocked the door';
+                    toggleBtn.innerHTML = '<span class="block mb-1">🔒 Reported locked</span>I unlocked the door';
                     toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-green-50 text-green-700 border border-green-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)]';
                 }
             }
