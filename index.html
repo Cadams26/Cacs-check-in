@@ -158,7 +158,6 @@
     <header class="p-6 flex justify-between items-center z-10 relative glass-panel rounded-b-3xl">
         <div class="flex items-center space-x-4">
             <div class="w-8 h-8 rounded-full border-2 border-gray-900 flex items-center justify-center font-bold text-xs tracking-tighter">RFE</div>
-            <button id="admin-nav-btn" onclick="promptAdminLogin()" class="hidden text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-black transition">Admin</button>
         </div>
 
         <div id="door-status-indicator" class="hidden items-center space-x-2 text-[11px] font-bold tracking-widest uppercase transition-colors duration-300">
@@ -323,7 +322,7 @@
 
             <div class="flex justify-center mb-8 px-4">
                 <button id="door-toggle-btn" onclick="toggleDoor()" class="w-full max-w-[200px] py-3 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-300 border shadow-sm glass-panel">
-                    Connecting to door...
+                    Loading reported door status...
                 </button>
             </div>
 
@@ -338,7 +337,7 @@
 
         <!-- Version Indicator -->
         <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
-            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.04</span>
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.07</span>
         </div>
 
         <!-- ADMIN LOGIN OVERLAY -->
@@ -768,7 +767,6 @@
         }
 
         function setupProfileUI() {
-            const adminBtn = document.getElementById('admin-nav-btn');
             const logoutBtn = document.getElementById('logout-btn');
             const welcomeText = document.getElementById('idle-welcome-text');
             const greetingContainer = document.getElementById('idle-greeting-container');
@@ -781,7 +779,6 @@
                 if (pb.authStore.model.role === 'Guest') {
                     greetingContainer.classList.add('hidden');
                     logoutBtn.style.display = 'none';
-                    adminBtn.style.display = 'none';
                     btnGuest.style.display = 'flex';
                     txtMember.innerHTML = 'Member';
                 } else {
@@ -793,16 +790,10 @@
                     btnGuest.style.display = 'none';
                     txtMember.innerHTML = `Check In As<br><span class="font-bold">${firstName}</span>`;
 
-                    if (pb.authStore.model.role === 'Admin') {
-                        adminBtn.style.display = 'block';
-                    } else {
-                        adminBtn.style.display = 'none';
-                    }
                 }
             } else {
                 greetingContainer.classList.add('hidden');
                 logoutBtn.style.display = 'none';
-                adminBtn.style.display = 'none';
                 btnGuest.style.display = 'flex';
                 txtMember.innerHTML = 'Member';
             }
@@ -856,7 +847,7 @@
                 ping.style.backgroundColor = '#EF4444'; dot.style.backgroundColor = '#EF4444';
             }
 
-            text.innerText = `${activeOccupantsText} • ${currentDoorStatus.toUpperCase()}`;
+            text.innerText = `${activeOccupantsText} • REPORTED ${currentDoorStatus.toUpperCase()}`;
         }
 
         function updateDoorUI() {
@@ -864,10 +855,10 @@
 
             if (toggleBtn) {
                 if (currentDoorStatus === 'Unlocked') {
-                    toggleBtn.innerHTML = '🔓 Door Unlocked - Tap to Lock';
+                    toggleBtn.innerHTML = '🔒 Yay, I locked the door';
                     toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-green-50 text-green-700 border border-green-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)]';
                 } else {
-                    toggleBtn.innerHTML = '🔒 Door Locked - Tap to Unlock';
+                    toggleBtn.innerHTML = '🔓 I unlocked the door';
                     toggleBtn.className = 'w-full max-w-[250px] py-3 rounded-full text-xs font-bold tracking-widest uppercase bg-red-50 text-red-700 border border-red-300 active:scale-95 transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)]';
                 }
             }
@@ -885,7 +876,7 @@
             } catch (err) {
                 currentDoorStatus = newStatus === 'Locked' ? 'Unlocked' : 'Locked';
                 updateDoorUI();
-                alert("Failed to communicate with door system.");
+                alert("Could not save the reported door status. Please try again.");
             }
         }
 
