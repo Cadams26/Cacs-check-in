@@ -337,7 +337,7 @@
 
         <!-- Version Indicator -->
         <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
-            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.10</span>
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.11</span>
         </div>
 
         <!-- ADMIN LOGIN OVERLAY -->
@@ -563,10 +563,17 @@
             playTone(523.25, 'sine', 0.8, 0.1, 0.2);    // C5
         }
 
+        function playDoorReportSound(status) {
+            if (audioCtx.state !== 'running') return;
+            const notes = status === 'Locked' ? [659.25, 523.25] : [523.25, 659.25];
+            playTone(notes[0], 'sine', 0.22, 0.12);
+            playTone(notes[1], 'sine', 0.38, 0.12, 0.12);
+        }
+
         document.addEventListener('click', (e) => {
             const isButton = e.target.tagName === 'BUTTON' || e.target.closest('button');
             const isZone = e.target.classList && e.target.classList.contains('zone-icon-btn') || e.target.closest('.zone-icon-btn');
-            if (isButton || isZone) {
+            if ((isButton || isZone) && !e.target.closest('#door-toggle-btn')) {
                 playClickSound();
             }
         });
@@ -869,11 +876,14 @@
 
         async function toggleDoor() {
             if (!doorRecordId) return;
+            // Resume during the user gesture; audio failure must not affect the report.
+            if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
             const newStatus = currentDoorStatus === 'Locked' ? 'Unlocked' : 'Locked';
             currentDoorStatus = newStatus;
             updateDoorUI();
             try {
                 await pb.collection('door').update(doorRecordId, { status: newStatus });
+                try { playDoorReportSound(newStatus); } catch (err) { console.warn('Door report sound unavailable', err); }
             } catch (err) {
                 currentDoorStatus = newStatus === 'Locked' ? 'Unlocked' : 'Locked';
                 updateDoorUI();
