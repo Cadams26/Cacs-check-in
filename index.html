@@ -8,12 +8,12 @@
     <script src="https://unpkg.com/pocketbase@0.19.0/dist/pocketbase.umd.js"></script>
     <style>
         :root {
-            --sharp-blue: #007aff;
-            --sharp-black: #1a1a2e;
+            --sharp-neutral: #525252;
+            --sharp-black: #262626;
             --glass-bg: rgba(255, 255, 255, 0.45);
             --glass-border: rgba(255, 255, 255, 0.6);
-            --glass-shadow: 0 8px 32px 0 rgba(14, 21, 47, 0.05);
-            --glow-color: rgba(0, 122, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(38, 38, 38, 0.05);
+            --glow-color: rgba(82, 82, 82, 0.15);
         }
 
         @keyframes ambient-glow {
@@ -51,36 +51,46 @@
             box-shadow: var(--glass-shadow);
         }
 
-        @keyframes breathe-blue {
-            0%, 100% { box-shadow: 0 0 20px 0px rgba(0, 122, 255, 0.15); border-color: rgba(0, 122, 255, 0.1); }
-            50% { box-shadow: 0 0 45px 12px rgba(0, 122, 255, 0.25); border-color: rgba(0, 122, 255, 0.3); }
+        @keyframes breathe-neutral {
+            0%, 100% { box-shadow: 0 0 20px 0px rgba(82, 82, 82, 0.15); border-color: rgba(82, 82, 82, 0.1); }
+            50% { box-shadow: 0 0 45px 12px rgba(82, 82, 82, 0.25); border-color: rgba(82, 82, 82, 0.3); }
         }
         @keyframes breathe-black {
-            0%, 100% { box-shadow: 0 0 20px 0px rgba(26, 26, 46, 0.1); border-color: rgba(26, 26, 46, 0.1); }
-            50% { box-shadow: 0 0 45px 12px rgba(26, 26, 46, 0.2); border-color: rgba(26, 26, 46, 0.2); }
+            0%, 100% { box-shadow: 0 0 20px 0px rgba(38, 38, 38, 0.1); border-color: rgba(38, 38, 38, 0.1); }
+            50% { box-shadow: 0 0 45px 12px rgba(38, 38, 38, 0.2); border-color: rgba(38, 38, 38, 0.2); }
         }
         @keyframes depart-pulse {
-            0% { box-shadow: 0 0 20px 0px rgba(26, 26, 46, 0.1); }
-            30% { box-shadow: 0 0 70px 20px rgba(0, 122, 255, 0.4); border-color: rgba(0, 122, 255, 0.5); }
-            100% { box-shadow: 0 0 20px 0px rgba(26, 26, 46, 0.1); }
+            0% { box-shadow: 0 0 20px 0px rgba(38, 38, 38, 0.1); }
+            30% { box-shadow: 0 0 70px 20px rgba(82, 82, 82, 0.4); border-color: rgba(82, 82, 82, 0.5); }
+            100% { box-shadow: 0 0 20px 0px rgba(38, 38, 38, 0.1); }
         }
 
         @keyframes soft-pulse {
-            0% { box-shadow: 0 0 0 0 rgba(71, 85, 105, 0.2); }
-            50% { box-shadow: 0 0 20px 5px rgba(71, 85, 105, 0.1); }
-            100% { box-shadow: 0 0 0 0 rgba(71, 85, 105, 0.2); }
+            0% { box-shadow: 0 0 0 0 rgba(82, 82, 82, 0.2); }
+            50% { box-shadow: 0 0 20px 5px rgba(82, 82, 82, 0.1); }
+            100% { box-shadow: 0 0 0 0 rgba(82, 82, 82, 0.2); }
         }
 
-        .aura-blue { border: 1px solid rgba(0, 122, 255, 0.2); animation: breathe-blue 6s infinite ease-in-out; }
-        .aura-black { border: 1px solid rgba(26, 26, 46, 0.2); animation: breathe-black 6s infinite ease-in-out; }
+        .aura-neutral { border: 1px solid rgba(82, 82, 82, 0.2); animation: breathe-neutral 6s infinite ease-in-out; }
+        .glass-action {
+            background: rgba(255, 255, 255, 0.65);
+            color: #262626;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 24px rgba(38, 38, 38, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+        .glass-action:hover { background: rgba(255, 255, 255, 0.85); }
+        .glass-action:focus-visible { outline: 2px solid #737373; outline-offset: 3px; }
+
+        .aura-black { border: 1px solid rgba(38, 38, 38, 0.2); animation: breathe-black 6s infinite ease-in-out; }
 
         .btn-slate-pulse {
-            background-color: rgba(248, 250, 252, 0.8);
-            border: 1px solid rgba(148, 163, 184, 0.3);
+            background-color: rgba(250, 250, 250, 0.8);
+            border: 1px solid rgba(163, 163, 163, 0.3);
             animation: soft-pulse 4s infinite ease-in-out;
         }
 
-        .unread-user { border: 1px solid rgba(0, 122, 255, 0.3) !important; animation: breathe-blue 4s infinite ease-in-out; cursor: pointer; transition: all 0.4s ease; }
+        .unread-user { border: 1px solid rgba(82, 82, 82, 0.3) !important; animation: breathe-neutral 4s infinite ease-in-out; cursor: pointer; transition: all 0.4s ease; }
         .depart-flash-active { animation: depart-pulse 3s cubic-bezier(0.4, 0, 0.2, 1) !important; }
 
         .circle-btn {
@@ -115,7 +125,7 @@
             margin-bottom: 1rem;
         }
         .input-clean:focus {
-            border-bottom-color: var(--sharp-blue);
+            border-bottom-color: var(--sharp-neutral);
             box-shadow: 0 10px 10px -10px var(--glow-color);
         }
 
@@ -190,7 +200,7 @@
 
             <button onclick="logoutProfile()" id="logout-btn" class="hidden mt-12 text-xs font-bold text-gray-400 uppercase tracking-widest">Sign Out</button>
 
-            <button onclick="showCalendarPage()" class="mt-12 text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center justify-center space-x-2 transition-colors duration-200 bg-blue-50/50 py-2 px-6 rounded-full border border-blue-100">
+            <button onclick="showCalendarPage()" class="mt-12 text-sm font-medium text-neutral-600 hover:text-neutral-800 flex items-center justify-center space-x-2 transition-colors duration-200 bg-neutral-50/50 py-2 px-6 rounded-full border border-neutral-100">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -222,7 +232,7 @@
             <div id="form-login" class="flex flex-col">
                 <input type="text" id="login-username" class="input-clean" placeholder="Username" autocapitalize="none">
                 <input type="password" id="login-pass" class="input-clean mb-6" placeholder="Password">
-                <button onclick="executeLogin()" class="w-full py-4 rounded-full font-bold text-lg text-white aura-blue active:scale-95 transition-transform" style="background-color: var(--sharp-blue);">Sign In</button>
+                <button onclick="executeLogin()" class="w-full py-4 rounded-full font-bold text-lg glass-action aura-neutral active:scale-95 transition-transform">Sign In</button>
             </div>
 
             <!-- Register Form -->
@@ -243,13 +253,13 @@
                 </div>
 
                 <div class="flex items-center mb-6 pl-2">
-                    <input type="checkbox" id="reg-tos" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                    <input type="checkbox" id="reg-tos" class="w-4 h-4 text-neutral-600 border-gray-300 rounded focus:ring-neutral-500 cursor-pointer">
                     <label id="reg-tos-label" for="reg-tos" class="ml-3 text-sm text-gray-500 select-none cursor-pointer">
-                        I agree to the Facility Access <span class="font-bold text-blue-600 hover:underline" onclick="event.preventDefault(); openTosModal();">terms</span>
+                        I agree to the Facility Access <span class="font-bold text-neutral-600 hover:underline" onclick="event.preventDefault(); openTosModal();">terms</span>
                     </label>
                 </div>
 
-                <button onclick="executeRegister()" class="w-full py-4 rounded-full font-bold text-lg text-white aura-blue active:scale-95 transition-transform" style="background-color: var(--sharp-blue);">Create Profile</button>
+                <button onclick="executeRegister()" class="w-full py-4 rounded-full font-bold text-lg glass-action aura-neutral active:scale-95 transition-transform">Create Profile</button>
             </div>
 
             <button onclick="goToView('view-idle')" class="mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest text-center w-full">Cancel</button>
@@ -266,7 +276,7 @@
             <div class="flex flex-col">
                 <input type="text" id="guest-name" class="input-clean" placeholder="First & Last Name">
                 <input type="text" id="guest-reason" class="input-clean mb-6" placeholder="Reason for Visit (Optional)">
-                <button onclick="executeGuestLogin()" class="w-full py-4 rounded-full font-bold text-lg text-white aura-blue active:scale-95 transition-transform" style="background-color: var(--sharp-blue);">Continue</button>
+                <button onclick="executeGuestLogin()" class="w-full py-4 rounded-full font-bold text-lg glass-action aura-neutral active:scale-95 transition-transform">Continue</button>
             </div>
         </div>
 
@@ -328,7 +338,7 @@
 
             <div class="glass-panel rounded-[2.5rem] p-6 max-h-[40vh] overflow-y-auto">
                 <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-5 flex items-center">
-                    <span class="w-1.5 h-1.5 rounded-full mr-2" style="background-color: var(--sharp-blue);"></span>
+                    <span class="w-1.5 h-1.5 rounded-full mr-2" style="background-color: var(--sharp-neutral);"></span>
                     Active Zones & Personnel
                 </h3>
                 <div id="active-roster" class="space-y-6"></div>
@@ -337,7 +347,7 @@
 
         <!-- Version Indicator -->
         <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
-            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.10</span>
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.12</span>
         </div>
 
         <!-- ADMIN LOGIN OVERLAY -->
@@ -346,7 +356,7 @@
                 <h3 class="text-xl font-bold mb-2">Admin Access</h3>
                 <p class="text-sm text-gray-500 mb-6">Please enter the admin PIN to continue.</p>
 
-                <input type="password" id="admin-pin-input" class="w-full text-center text-2xl tracking-[0.5em] py-3 rounded-2xl border-2 border-gray-100 bg-gray-50 mb-4 outline-none focus:border-blue-500 focus:bg-white transition-colors" placeholder="****" maxlength="4">
+                <input type="password" id="admin-pin-input" class="w-full text-center text-2xl tracking-[0.5em] py-3 rounded-2xl border-2 border-gray-100 bg-gray-50 mb-4 outline-none focus:border-neutral-500 focus:bg-white transition-colors" placeholder="****" maxlength="4">
 
                 <div class="flex space-x-3">
                     <button onclick="closeAdminLogin()" class="flex-1 py-3 rounded-xl font-bold text-gray-600 bg-gray-100 active:bg-gray-200">Cancel</button>
@@ -403,7 +413,7 @@
                 <div id="admin-tab-events" class="admin-tab-content hidden">
                     <div class="flex justify-between items-center mb-5">
                         <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Upcoming Events</h3>
-                        <button onclick="openEventModal()" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">+ Add</button>
+                        <button onclick="openEventModal()" class="text-xs font-bold text-neutral-600 bg-neutral-50 px-3 py-1 rounded-full">+ Add</button>
                     </div>
                     <div id="admin-events-list" class="space-y-3">
                         <p class="text-sm text-gray-400">Loading events...</p>
@@ -452,7 +462,7 @@
                 </button>
             </div>
 
-            <button onclick="submitNewEvent()" class="w-full py-4 rounded-full font-bold text-lg text-white bg-blue-600 active:scale-95 transition-transform mb-3 shadow-lg shadow-blue-600/30">Save Event</button>
+            <button onclick="submitNewEvent()" class="w-full py-4 rounded-full font-bold text-lg glass-action active:scale-95 transition-transform mb-3 shadow-sm">Save Event</button>
             <button onclick="closeEventModal()" class="w-full py-3 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Cancel</button>
         </div>
     </div>
@@ -481,7 +491,7 @@
                 </div>
             </div>
 
-            <button onclick="closeTosModal()" class="w-full py-4 rounded-full font-bold text-lg text-white bg-blue-600 active:scale-95 transition-transform shadow-lg shadow-blue-600/30">Close</button>
+            <button onclick="closeTosModal()" class="w-full py-4 rounded-full font-bold text-lg glass-action active:scale-95 transition-transform shadow-sm">Close</button>
         </div>
     </div>
 
@@ -563,10 +573,17 @@
             playTone(523.25, 'sine', 0.8, 0.1, 0.2);    // C5
         }
 
+        function playDoorReportSound(status) {
+            if (audioCtx.state !== 'running') return;
+            const notes = status === 'Locked' ? [659.25, 523.25] : [523.25, 659.25];
+            playTone(notes[0], 'sine', 0.22, 0.12);
+            playTone(notes[1], 'sine', 0.38, 0.12, 0.12);
+        }
+
         document.addEventListener('click', (e) => {
             const isButton = e.target.tagName === 'BUTTON' || e.target.closest('button');
             const isZone = e.target.classList && e.target.classList.contains('zone-icon-btn') || e.target.closest('.zone-icon-btn');
-            if (isButton || isZone) {
+            if ((isButton || isZone) && !e.target.closest('#door-toggle-btn')) {
                 playClickSound();
             }
         });
@@ -650,12 +667,12 @@
         function selectRole(role, btnElement) {
             selectedRegRole = role;
             document.querySelectorAll('.role-btn').forEach(btn => {
-                btn.classList.remove('aura-blue');
+                btn.classList.remove('aura-neutral');
                 btn.style.color = '#4b5563';
                 btn.style.borderColor = '#e5e7eb';
             });
-            btnElement.classList.add('aura-blue');
-            btnElement.style.color = 'var(--sharp-blue)';
+            btnElement.classList.add('aura-neutral');
+            btnElement.style.color = 'var(--sharp-neutral)';
         }
 
         function openTosModal() {
@@ -869,11 +886,14 @@
 
         async function toggleDoor() {
             if (!doorRecordId) return;
+            // Resume during the user gesture; audio failure must not affect the report.
+            if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
             const newStatus = currentDoorStatus === 'Locked' ? 'Unlocked' : 'Locked';
             currentDoorStatus = newStatus;
             updateDoorUI();
             try {
                 await pb.collection('door').update(doorRecordId, { status: newStatus });
+                try { playDoorReportSound(newStatus); } catch (err) { console.warn('Door report sound unavailable', err); }
             } catch (err) {
                 currentDoorStatus = newStatus === 'Locked' ? 'Unlocked' : 'Locked';
                 updateDoorUI();
@@ -1111,7 +1131,7 @@
                     return `
                     <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 mb-4 transition hover:shadow-md">
                         <h3 class="text-xl font-bold text-gray-900 mb-1">${ev.title}</h3>
-                        <div class="flex items-center text-sm font-bold text-blue-600 mb-3">
+                        <div class="flex items-center text-sm font-bold text-neutral-600 mb-3">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                             ${ev.date || 'TBD'}
                         </div>
@@ -1146,17 +1166,17 @@
             document.getElementById('event-input-title').value = '';
             document.getElementById('event-input-date').value = '';
             document.querySelectorAll('.zone-toggle').forEach(btn => {
-                btn.classList.remove('bg-blue-50', 'border-blue-300', 'text-blue-600');
+                btn.classList.remove('bg-neutral-50', 'border-neutral-300', 'text-neutral-600');
                 btn.classList.add('text-gray-400');
             });
         }
 
         function toggleZoneBtn(btn) {
-            if (btn.classList.contains('bg-blue-50')) {
-                btn.classList.remove('bg-blue-50', 'border-blue-300', 'text-blue-600');
+            if (btn.classList.contains('bg-neutral-50')) {
+                btn.classList.remove('bg-neutral-50', 'border-neutral-300', 'text-neutral-600');
                 btn.classList.add('text-gray-400');
             } else {
-                btn.classList.add('bg-blue-50', 'border-blue-300', 'text-blue-600');
+                btn.classList.add('bg-neutral-50', 'border-neutral-300', 'text-neutral-600');
                 btn.classList.remove('text-gray-400');
             }
         }
@@ -1171,7 +1191,7 @@
             }
 
             const activeZones = [];
-            document.querySelectorAll('.zone-toggle.bg-blue-50').forEach(btn => {
+            document.querySelectorAll('.zone-toggle.bg-neutral-50').forEach(btn => {
                 activeZones.push(btn.getAttribute('data-zone'));
             });
 
