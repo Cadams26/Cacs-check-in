@@ -6,7 +6,7 @@ function csvCell(value) {
     return '"' + text.replace(/"/g, '""') + '"';
 }
 function csv(records) {
-    const fields = ['id', 'name', 'status', 'zone', 'created', 'updated'];
+    const fields = ['id', 'name', 'role', 'status', 'zone', 'intent', 'usedkey', 'checkoutNote', 'created', 'updated'];
     return '\uFEFF' + fields.join(',') + '\r\n' + records.map(row => fields.map(key => csvCell(row[key])).join(',')).join('\r\n') + '\r\n';
 }
 function summary(batch) {
