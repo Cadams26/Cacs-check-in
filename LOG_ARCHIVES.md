@@ -1,6 +1,6 @@
 # Owner log archives
 
-Alpha 0.15 replaces individual log deletion with **Create dated backup**, then **Email & clear completed logs**.
+Alpha 0.17 replaces individual log deletion with **Create dated backup**, then **Email & clear completed logs**. The CSV includes name, role, status, destination, intent, key use, checkout note, record ID and timestamps.
 
 The backend requires the existing owner user ID `a9rnjyz6g54spr1`. Role labels and the UI PIN grant no archive permission. SMTP credentials stay in PocketBase settings. The sender and two recipients are private server configuration in `/pb_data/archive-settings.json`, outside the public repository and webroot. Format: `{"sender":"sender@example.com","recipients":["administrator@example.com","principal@example.com"]}`. Protect this file with mode 0600.
 
