@@ -12,7 +12,7 @@ function idCheck(id) {
 }
 function path(id, ext) { return root() + '/cacs-logs-' + idCheck(id) + '.' + ext; }
 function read(pathname) {
-    const file = $os.open(pathname);
+    const file = $os.dirFS($filepath.dir(pathname)).open($filepath.base(pathname));
     try { return readerToString(file, 64 * 1024 * 1024); } finally { file.close(); }
 }
 function atomic(pathname, content) {
@@ -59,7 +59,7 @@ const adapter = {
     validate: (records, allowMissing) => check($app.dao(), records, allowMissing),
     send: (batch, recipient) => {
         if (!$app.settings().smtp.enabled || $app.settings().meta.senderAddress !== settings().sender) throw new Error('Configured sender is required.');
-        const file = $os.open(path(batch.id, 'csv'));
+        const file = $os.dirFS(root()).open('cacs-logs-' + idCheck(batch.id) + '.csv');
         try {
             const attachments = {};
             attachments['cacs-logs-' + batch.id + '.csv'] = file;
