@@ -168,6 +168,7 @@
     <header class="p-6 flex justify-between items-center z-10 relative glass-panel rounded-b-3xl">
         <div class="flex items-center space-x-4">
             <div class="w-8 h-8 rounded-full border-2 border-gray-900 flex items-center justify-center font-bold text-xs tracking-tighter">RFE</div>
+            <button id="admin-menu-btn" onclick="promptAdminLogin()" class="hidden text-xs font-semibold text-neutral-600 hover:text-neutral-900 px-3 py-2 rounded-full border border-neutral-200 bg-white/40 backdrop-blur-md">Admin</button>
         </div>
 
         <div id="door-status-indicator" class="hidden items-center space-x-2 text-[11px] font-bold tracking-widest uppercase transition-colors duration-300">
@@ -347,7 +348,7 @@
 
         <!-- Version Indicator -->
         <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
-            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.12</span>
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.13</span>
         </div>
 
         <!-- ADMIN LOGIN OVERLAY -->
@@ -597,7 +598,13 @@
         let activeOccupantsText = 'Empty';
         let selectedRegRole = 'Guest';
 
+        function isOwnerAccount() {
+            return pb.authStore.isValid &&
+                String(pb.authStore.model?.username || '').toLowerCase() === 'cadams';
+        }
+
         function promptAdminLogin() {
+            if (!isOwnerAccount()) return;
             document.getElementById('admin-login-modal').classList.replace('hidden', 'flex');
             setTimeout(() => {
                 document.getElementById('admin-modal-content').classList.replace('scale-95', 'scale-100');
@@ -614,6 +621,10 @@
         }
 
         function verifyAdminLogin() {
+            if (!isOwnerAccount()) {
+                closeAdminLogin();
+                return;
+            }
             const pin = document.getElementById('admin-pin-input').value;
             // In a production app, this would be verified server-side.
             // For this static site, a simple PIN acts as a basic deterrent.
@@ -784,6 +795,7 @@
         }
 
         function setupProfileUI() {
+            document.getElementById('admin-menu-btn').classList.toggle('hidden', !isOwnerAccount());
             const logoutBtn = document.getElementById('logout-btn');
             const welcomeText = document.getElementById('idle-welcome-text');
             const greetingContainer = document.getElementById('idle-greeting-container');
