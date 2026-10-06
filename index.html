@@ -348,7 +348,7 @@
 
         <!-- Version Indicator -->
         <div class="fixed bottom-4 right-6 z-10 pointer-events-none opacity-40">
-            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.14</span>
+            <span class="text-[10px] font-medium tracking-widest text-gray-500">Alpha 0.15</span>
         </div>
 
         <!-- ADMIN LOGIN OVERLAY -->
@@ -419,6 +419,13 @@
                 <!-- LOGS TAB -->
                 <div id="admin-tab-logs" class="admin-tab-content hidden">
                     <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-5">Historical Logs</h3>
+                    <div class="bg-white/40 border border-white/60 rounded-2xl p-4 mb-5">
+                        <p class="text-sm font-semibold text-neutral-800">Archive completed logs</p>
+                        <p class="text-xs text-neutral-600 mt-2">Save a dated backup on Unraid, then email it to the administrator and principal before clearing. Active check-ins stay on the board.</p>
+                        <button id="prepare-log-archive" onclick="prepareLogArchive(this)" class="mt-3 bg-neutral-800 text-white text-xs font-semibold px-4 py-2 rounded-full disabled:opacity-50">Create dated backup</button>
+                        <p id="log-archive-message" role="status" class="text-xs text-neutral-600 mt-3"></p>
+                        <div id="log-archive-list" class="mt-3 space-y-3"></div>
+                    </div>
                     <div id="admin-logs-list" class="space-y-3">
                         <p class="text-sm text-gray-400">Loading logs...</p>
                     </div>
@@ -1071,22 +1078,85 @@
             }
         }
 
-        async function deleteAdminLog(logId, button) {
+        function archiveMessage(message) {
+            document.getElementById('log-archive-message').textContent = message;
+        }
+
+        async function fetchLogArchives() {
+            if (!isOwnerAccount()) return;
+            try {
+                const batches = await pb.send('/api/cacs/log-archives', {method: 'GET'});
+                const list = document.getElementById('log-archive-list');
+                list.innerHTML = batches.map(batch => `
+                    <div class="border border-neutral-200 bg-white/40 rounded-xl p-3">
+                        <p class="text-xs font-semibold">${escapeAdminText(new Date(batch.created).toLocaleString())} · ${Number(batch.count)} records</p>
+                        <p class="text-xs text-neutral-600 mt-1">${batch.state === 'cleared' ? 'Archived and cleared' : 'Backup saved · awaiting completion'}</p>
+                        <p class="text-xs text-neutral-600 mt-1">${batch.recipients.map(escapeAdminText).join(' · ')}</p>
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            <button onclick="downloadLogArchive('${escapeAdminText(batch.id)}', 'csv', this)" class="text-xs border border-neutral-300 rounded-full px-3 py-1 disabled:opacity-50">Download CSV</button>
+                            <button onclick="downloadLogArchive('${escapeAdminText(batch.id)}', 'json', this)" class="text-xs border border-neutral-300 rounded-full px-3 py-1 disabled:opacity-50">Recovery backup</button>
+                            ${batch.state !== 'cleared' ? `<button onclick="finishLogArchive('${escapeAdminText(batch.id)}', ${Number(batch.count)}, this)" class="text-xs bg-neutral-800 text-white rounded-full px-3 py-1 disabled:opacity-50">Email &amp; clear completed logs</button>` : ''}
+                        </div>
+                    </div>`).join('') || '<p class="text-xs text-neutral-500">No archives yet.</p>';
+            } catch (_) {
+                archiveMessage('Could not load archives. Check your connection and the backend archive service.');
+            }
+        }
+
+        async function prepareLogArchive(button) {
             if (!isOwnerAccount() || button.disabled) return;
-            if (!confirm('Permanently delete this check-in log? This cannot be undone. Deleting a checked-in entry also removes it from the occupancy board.')) return;
+            button.disabled = true;
+            archiveMessage('Saving and verifying your dated backup…');
+            try {
+                const batch = await pb.send('/api/cacs/log-archives/prepare', {method: 'POST'});
+                archiveMessage('Backup saved: ' + batch.count + ' completed records. Download it or confirm Email & clear below.');
+                await fetchLogArchives();
+            } catch (error) {
+                archiveMessage(error.response?.message || 'Could not create the backup. No logs were cleared.');
+            } finally { button.disabled = false; }
+        }
+
+        async function finishLogArchive(id, count, button) {
+            if (!isOwnerAccount() || button.disabled) return;
+            let recipients;
+            try {
+                const batches = await pb.send('/api/cacs/log-archives', {method: 'GET'});
+                const batch = batches.find(item => item.id === id);
+                if (!batch) throw new Error('Archive missing');
+                recipients = batch.recipients.join(' and ');
+            } catch (_) { archiveMessage('Could not verify the archive recipients. Nothing was cleared.'); return; }
+            if (!confirm('Email the dated backup of ' + count + ' completed logs to ' + recipients + ', then clear those records? Active check-ins stay on the board. The backup remains on Unraid.')) return;
+            button.disabled = true;
+            archiveMessage('Sending the backup and clearing completed logs. Please wait…');
+            try {
+                await pb.send('/api/cacs/log-archives/' + encodeURIComponent(id) + '/finish', {
+                    method: 'POST', body: {confirmation: 'EMAIL_AND_CLEAR_COMPLETED_LOGS'}
+                });
+                archiveMessage('Backup accepted for sending to both recipients. Completed logs cleared; backup retained on Unraid.');
+                await fetchAdminLogs();
+                await fetchLogArchives();
+            } catch (error) {
+                archiveMessage((error.response?.message || 'Operation interrupted. Reload archives to check its status before retrying.') + ' The dated backup remains on Unraid.');
+                await fetchLogArchives();
+            } finally { button.disabled = false; }
+        }
+
+        async function downloadLogArchive(id, format, button) {
+            if (!isOwnerAccount() || button.disabled) return;
             button.disabled = true;
             try {
-                await pb.collection('logs').delete(logId);
-                if (localStorage.getItem('rfe_glass_record_id') === logId) {
-                    localStorage.removeItem('rfe_glass_record_id');
-                }
-                await fetchAdminLogs();
-                await fetchBoard();
-            } catch (err) {
-                alert('Could not delete the log. Check your connection and account permissions.');
-            } finally {
-                button.disabled = false;
-            }
+                const response = await fetch(pb.baseUrl + '/api/cacs/log-archives/' + encodeURIComponent(id) + '/' + format, {
+                    headers: {Authorization: pb.authStore.token}, cache: 'no-store'
+                });
+                if (!response.ok) throw new Error('Download failed');
+                const url = URL.createObjectURL(await response.blob());
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'cacs-logs-' + id + '.' + format;
+                link.click();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            } catch (_) { archiveMessage('Could not download the backup. Check your connection and owner login.'); }
+            finally { button.disabled = false; }
         }
 
         function switchAdminTab(tabName) {
@@ -1102,7 +1172,7 @@
             activeBtn.classList.remove('hover:bg-gray-100', 'text-gray-500');
 
             if (tabName === 'users') fetchAdminUsers();
-            if (tabName === 'logs') fetchAdminLogs();
+            if (tabName === 'logs') { fetchAdminLogs(); fetchLogArchives(); }
             if (tabName === 'events') fetchAdminEvents();
             if (tabName === 'sessions') fetchBoard();
         }
@@ -1164,7 +1234,6 @@
                         </div>
                         <div class="flex justify-between items-center gap-3">
                             <p class="text-xs text-gray-500">${escapeAdminText(log.zone)} • ${date}</p>
-                            <button onclick="deleteAdminLog('${log.id}', this)" class="text-xs font-semibold text-red-700 border border-red-200 bg-white/50 px-3 py-1.5 rounded-full disabled:opacity-50" aria-label="Delete log for ${escapeAdminText(log.name)}">Delete</button>
                         </div>
                     </div>`;
                 }).join('');
@@ -1460,3 +1529,4 @@
     </script>
 </body>
 </html>
+
