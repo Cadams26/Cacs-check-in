@@ -62,7 +62,7 @@ function fixture() {
 }
 const source=fs.readFileSync('index.html','utf8');
 for(const match of source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) new vm.Script(match[1]);
-assert.ok(!source.includes('deleteAdminLog')); assert.ok(source.includes('Alpha 0.15'));
+assert.ok(!source.includes('deleteAdminLog')); assert.ok(source.includes('Alpha 0.16'));
 let moduleResult;
 vm.runInNewContext(fs.readFileSync('pb_hooks/archive-adapter.js','utf8'), {
     __hooks: '.',require:()=>core,module: {set exports(value){moduleResult=value;}},ForbiddenError: Error
